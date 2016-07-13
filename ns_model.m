@@ -141,11 +141,6 @@ for k = 1:num_sims
                     if rand < p
                         velocity = velocity - 1;
                     end
-                %%% Catch gap = 0 error??
-                elseif gap == 0
-                    disp('=====Missing Car=====');
-                    fprintf('Current velocity = %d\n', velocity);
-%                     velocity = 0;
                 end
 
                 %%% CAR MOTION %%%
