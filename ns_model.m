@@ -108,19 +108,29 @@ for k = 1:num_sims
                 % site i + j (with j =< v), it reduces its speed to
                 % j - 1 [v -> j - 1]
                
-                elseif gap < velocity + 1 && velocity ~= 0
-                    % Otherwise decelerate car
+                elseif gap <= velocity && velocity ~= 0
+                    % Otherwise if gap is LESS than the velocity value
+                    % incremented by one and the velocity is NOT zero,
+                    % decelerate the car
+                    
+                    % Site i is the current site. j is the number of steps
+                    % to be taken and MUST be EQUAL TO OR LESS than
+                    % velocity v
                     
                     % Most likely need to re-evaluate this code
+                    
+                    % set new velocity of vehicle as the smaller of two
+                    % numbers
+                    if gap == velocity
+                        % do nothing
+                    elseif gap + 1 == velocity
+                        velocity = velocity - 1;
+                    else
+                        velocity = min(velocity - 1, gap);
+                    end
+                    
+                    fprintf('velocity: %d\n', velocity);
 
-                    
-                    
-                    
-                    
-                    
-                    
-                    % Decrease velocity
-                    velocity = velocity - 1;
 
                 %%% 3. RANDOMISATION %%%
                 elseif velocity > 0
