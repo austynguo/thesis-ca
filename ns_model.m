@@ -99,12 +99,26 @@ for k = 1:num_sims
                     % Increase velocity
                     velocity = velocity + 1;
 
-                 %% recode acceleration as binary or trinary interaction??
+                %%% What time dependent data can be encoded?
+                %%% recode acceleration as binary or trinary interaction??
                     
                     
-                %%% 2. DECELERATION %%%
+                %%% 2. SLOWING DOWN (Due to other cars) %%%
+                % If a vehicle at site i sees the next vehicle at
+                % site i + j (with j =< v), it reduces its speed to
+                % j - 1 [v -> j - 1]
+               
                 elseif gap < velocity + 1 && velocity ~= 0
                     % Otherwise decelerate car
+                    
+                    % Most likely need to re-evaluate this code
+
+                    
+                    
+                    
+                    
+                    
+                    
                     % Decrease velocity
                     velocity = velocity - 1;
 
@@ -159,6 +173,7 @@ for k = 1:num_sims
     %% Calc time averaged density
     % only calcs for first column atm
     tadsum = 0;
+    tadseries = zeros(1, n); %preallocate number of timesteps in currenet round
 
     for i = 1:n
         if verbose fprintf('c{%d, 1}: %d', i, c{i, 1}); end
@@ -167,7 +182,12 @@ for k = 1:num_sims
             % should be:
             % sum = sum + 1;
     %         disp(sum);
+            fprintf('Density at timestep %d: %d %f\n', i, c{i, 1}, c{i, 1}/n);
+            
         end
+        
+        tadseries(i) = c{i, 1}/n;
+        
         if verbose disp(tadsum); end
     end
 
@@ -179,7 +199,8 @@ for k = 1:num_sims
     % calc for column 1 and 2
 
     tafsum = 0;
-
+    tafseries = zeros(1, n); %preallocate number of timesteps in currenet round
+    
     % c{n time steps, m road length}
     % for each row
     for i = 1:n-1
@@ -196,7 +217,12 @@ for k = 1:num_sims
 
             if c{i+1, temp1} ~= ' ' && c{i+1, temp1} > j 
                 tafsum = tafsum + 1;
+                fprintf('Flow at timestep %d: %d %f\n', i, c{i+1, temp1}, c{i+1, temp1}/n);
+                
             end
+            
+            tafseries(i) = c{i+1, temp1}/n;
+            
         end
         if verbose fprintf('Time Averaged Flow cumulative sum: ', tafsum); end
     end
