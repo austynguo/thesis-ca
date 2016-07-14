@@ -6,8 +6,8 @@ verbose = false;
 
 %% INITIALISATION
 % Initialise n by m grid of cells
-n = 10; %number of time steps
-m = 10; %length of 'road'
+n = 100; %number of time steps
+m = 80; %length of 'road'
 c = cell(n, m); 
 
 
@@ -79,9 +79,7 @@ for k = 1:num_sims
                 velocity = c{row_counter, i};
 
                 % print position out
-                if verbose
-                    fprintf('Position: %d\n', i);
-                end
+                if verbose fprintf('Position: %d\n', i); end
 
                 %%% CALCULATE GAP %%%
                 % pseudocode:
@@ -98,17 +96,21 @@ for k = 1:num_sims
                     % If gap greater than velocity and under v_max, car can accelerate
                     % Increase velocity
                     velocity = velocity + 1;
-
+                    % testing ending if statement so each step is independent
+                end
+                
+                
                 %%% What time dependent data can be encoded?
                 %%% recode acceleration as binary or trinary interaction??
-                    
+                
+                
                     
                 %%% 2. SLOWING DOWN (Due to other cars) %%%
                 % If a vehicle at site i sees the next vehicle at
                 % site i + j (with j =< v), it reduces its speed to
                 % j - 1 [v -> j - 1]
-               
-                elseif gap <= velocity && velocity ~= 0
+                
+                if gap <= velocity && velocity ~= 0
                     % Otherwise if gap is LESS than the velocity value
                     % incremented by one and the velocity is NOT zero,
                     % decelerate the car
@@ -128,17 +130,23 @@ for k = 1:num_sims
                     else
                         velocity = min(velocity - 1, gap);
                     end
-                    
-                    fprintf('velocity: %d\n', velocity);
-
+                    if verbose
+                        fprintf('velocity: %d\n', velocity);
+                    end
 
                 %%% 3. RANDOMISATION %%%
-                elseif velocity > 0
+                
+                %% CHECK THAT THIS SECTION IS ACTUALLY REACHED!
+                end
+%                 elseif velocity > 0
+                %% Make randomisation step independent from accel/deceleration
+                % i.e. it can accelerate and brake immediately
+                if velocity > 0
                     % if rand number less than p threshold, then reduce velocity
                     % probability p
                     p = 0.25;
 
-                    if rand < p
+                    if rand < p && velocity ~= 0
                         velocity = velocity - 1;
                     end
                 end
@@ -154,7 +162,7 @@ for k = 1:num_sims
                 % Probably not needed if random seeding is fixed
                 % loljks still need to write this
                 
-                % Update car movement in the next row
+                %% Update car movement in the next row
                 c{row_counter + 1, newPosition} = velocity;
             end
         end
