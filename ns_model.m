@@ -130,9 +130,7 @@ for k = 1:num_sims
                     else
                         velocity = min(velocity - 1, gap);
                     end
-                    if verbose
-                        fprintf('velocity: %d\n', velocity);
-                    end
+                    if verbose fprintf('velocity: %d\n', velocity); end
 
                 %%% 3. RANDOMISATION %%%
                 
