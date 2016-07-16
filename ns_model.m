@@ -7,7 +7,7 @@ verbose = false;
 %% INITIALISATION
 % Initialise n by m grid of cells
 n = 100; %number of time steps
-m = 80; %length of 'road'
+m = 100; %length of 'road'
 c = cell(n, m); 
 
 
@@ -18,7 +18,7 @@ row_counter = 1;
 v_max = 5;
 
 % Number of simulation rounds
-num_sims = 1;
+num_sims = 100;
 
 % Pre-allocate array of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
@@ -75,8 +75,11 @@ for k = 1:num_sims
         row_counter = j;
         for i = 1:m
             if (c{row_counter, i} >= 0 && c{row_counter, i} ~= ' ')
-                % Get velocity
+                % Get current velocity
                 velocity = c{row_counter, i};
+                
+                % set new velo = curr velo
+                % new_velocity = curr_velocity;
 
                 % print position out
                 if verbose fprintf('Position: %d\n', i); end
@@ -93,7 +96,8 @@ for k = 1:num_sims
 
                 %%% 1. ACCELERATION %%%
                 if gap > velocity + 1 && velocity < v_max
-                    % If gap greater than velocity and under v_max, car can accelerate
+                    % If gap greater than current velocity and under v_max,
+                    % car can accelerate
                     % Increase velocity
                     velocity = velocity + 1;
                     % testing ending if statement so each step is independent
@@ -124,13 +128,13 @@ for k = 1:num_sims
                     % set new velocity of vehicle as the smaller of two
                     % numbers
                     if gap == velocity
-                        % do nothing
+                        % do nothing? or assign like below???
                     elseif gap + 1 == velocity
                         velocity = velocity - 1;
                     else
                         velocity = min(velocity - 1, gap);
                     end
-                    if verbose fprintf('velocity: %d\n', velocity); end
+                    if verbose fprintf('new_velocity: %d\n', velocity); end
 
                 %%% 3. RANDOMISATION %%%
                 
@@ -139,7 +143,7 @@ for k = 1:num_sims
 %                 elseif velocity > 0
                 %% Make randomisation step independent from accel/deceleration
                 % i.e. it can accelerate and brake immediately
-                if velocity > 0
+                if velocity > 0 && velocity > 0
                     % if rand number less than p threshold, then reduce velocity
                     % probability p
                     p = 0.25;
@@ -159,6 +163,8 @@ for k = 1:num_sims
                 %[TODO: Write catch case so cars don't drive on top of each other???]
                 % Probably not needed if random seeding is fixed
                 % loljks still need to write this
+                
+                fprintf('new velocity = %d\n', velocity);
                 
                 %% Update car movement in the next row
                 c{row_counter + 1, newPosition} = velocity;
@@ -184,7 +190,7 @@ for k = 1:num_sims
     %% Calc time averaged density
     % only calcs for first column atm
     tadsum = 0;
-    tadseries = zeros(1, n); %preallocate number of timesteps in currenet round
+    tadseries = zeros(1, n); %preallocate number of timesteps in current round
 
     for i = 1:n
         if verbose fprintf('c{%d, 1}: %d', i, c{i, 1}); end
@@ -210,7 +216,7 @@ for k = 1:num_sims
     % calc for column 1 and 2
 
     tafsum = 0;
-    tafseries = zeros(1, n); %preallocate number of timesteps in currenet round
+    tafseries = zeros(1, n); %preallocate number of timesteps in current round
     
     % c{n time steps, m road length}
     % for each row
@@ -253,7 +259,9 @@ for k = 1:num_sims
     tadsum = 0;
 end
 
-
-
+%% Export final cell array to csv format
+cell2csv('test.csv', c, ', ', 2013, '.');
+% cell2csv('tadseries.csv', tadseries, ', ', 2013, '.');
+% cell2csv('tafseries.csv', tafseries, ', ', 2013, '.');
 
 
