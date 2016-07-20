@@ -22,8 +22,10 @@ num_sims = 100;
 
 % Pre-allocate array of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
+
 time_average_flow_array = zeros(1, num_sims);
 time_average_density_array = zeros(1, num_sims);
+
 num_cars_array = zeros(1, num_sims);
 missing_cars_array = zeros(1, num_sims);
 
@@ -53,22 +55,34 @@ for k = 1:num_sims
     % [TODO: Combine above and below for loops]
     
     % Initialise some vehicles
-    % Method of randomly seeding vehicles
+    % Method of random vehicle seeding
     num_cars = 0;
+    
+    % Randomly generate a capped value for number of cars for this round
+    % only. The aim is to ensure an even spread of simulations for a wide
+    % range of vehicle numbers.
+    %% Check if INT rounding occurs properly!
+    max_num_cars = rand * m;
+    
     for j = 1:m
+        % Check each step that we do not exceed our predetermined value
+        if num_cars >= max_num_cars
+            break;
+        end
         if generation_gap ~= 0
             generation_gap = generation_gap - 1;
             continue
         end
         % 50% chance of new vehicle being created
-        if 0.5 > rand
+%         if 0.75 > rand
             % generate vehicle with random speed rounded to nearest int
             speed = round(v_max * rand, 0);
             generation_gap = speed;
             c{1, j} = speed;
             num_cars = num_cars + 1;
-        end
+%         end
     end
+    
     num_cars_array(k) = num_cars;
 
     for j = 1:n-1
@@ -258,6 +272,10 @@ for k = 1:num_sims
     tad = 0;
     tadsum = 0;
 end
+
+% sort number of cars for easy graph reading
+num_cars_array_sorted = sort(num_cars_array);
+
 
 %% Export final cell array to csv format
 cell2csv('test.csv', c, ', ', 2013, '.');
