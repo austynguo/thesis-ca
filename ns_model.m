@@ -18,7 +18,7 @@ row_counter = 1;
 v_max = 5;
 
 % Number of simulation rounds
-num_sims = 100;
+num_sims = 500;
 
 % Pre-allocate array of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
@@ -204,7 +204,6 @@ for k = 1:num_sims
     %% Calc time averaged density
     % only calcs for first column atm
     tadsum = 0;
-    tadseries = zeros(1, n); %preallocate number of timesteps in current round
 
     for i = 1:n
         if verbose fprintf('c{%d, 1}: %d', i, c{i, 1}); end
@@ -217,8 +216,6 @@ for k = 1:num_sims
             
         end
         
-        tadseries(i) = c{i, 1}/n;
-        
         if verbose disp(tadsum); end
     end
 
@@ -230,7 +227,6 @@ for k = 1:num_sims
     % calc for column 1 and 2
 
     tafsum = 0;
-    tafseries = zeros(1, n); %preallocate number of timesteps in current round
     
     % c{n time steps, m road length}
     % for each row
@@ -250,10 +246,7 @@ for k = 1:num_sims
                 tafsum = tafsum + 1;
                 fprintf('Flow at timestep %d: %d %f\n', i, c{i+1, temp1}, c{i+1, temp1}/n);
                 
-            end
-            
-            tafseries(i) = c{i+1, temp1}/n;
-            
+            end            
         end
         if verbose fprintf('Time Averaged Flow cumulative sum: ', tafsum); end
     end
