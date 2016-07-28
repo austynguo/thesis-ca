@@ -7,7 +7,7 @@ verbose = false;
 %% INITIALISATION
 % Initialise n by m grid of cells
 n = 100; %number of time steps
-m = 100; %length of 'road'
+m = 50; %length of 'road'
 c = cell(n, m); 
 
 
@@ -15,10 +15,10 @@ c = cell(n, m);
 row_counter = 1;
 
 % Maximum Velocity
-v_max = 5;
+v_max = 3;
 
 % Number of simulation rounds
-num_sims = 500;
+num_sims = 1;
 
 % Pre-allocate array of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
@@ -29,6 +29,9 @@ time_average_density_array = zeros(1, num_sims);
 num_cars_array = zeros(1, num_sims);
 missing_cars_array = zeros(1, num_sims);
 
+% Vehicle generation method
+% Options = 'random', 'naive', 'none'
+initialisation_method = 'naive';
 
 %% Previous static method of seeding cars 
 % num_cars = 3;
@@ -54,33 +57,52 @@ for k = 1:num_sims
 
     % [TODO: Combine above and below for loops]
     
-    % Initialise some vehicles
+    %% Initialise vehicles (locations and speeds)
     % Method of random vehicle seeding
     num_cars = 0;
     
-    % Randomly generate a capped value for number of cars for this round
-    % only. The aim is to ensure an even spread of simulations for a wide
-    % range of vehicle numbers.
-    %% Check if INT rounding occurs properly!
-    max_num_cars = rand * m;
-    
-    for j = 1:m
-        % Check each step that we do not exceed our predetermined value
-        if num_cars >= max_num_cars
-            break;
-        end
-        if generation_gap ~= 0
-            generation_gap = generation_gap - 1;
-            continue
-        end
-        % 50% chance of new vehicle being created
-%         if 0.75 > rand
+    if strcmp(initialisation_method, 'random')
+        %% Random vehicle initialisation
+        % Randomly generate a capped value for number of cars for this round
+        % only. The aim is to ensure an even spread of simulations for a wide
+        % range of vehicle numbers.
+        %% Check if INT rounding occurs properly!
+        max_num_cars = rand * m;
+
+        for j = 1:m
+            % Check each step that we do not exceed our predetermined value
+            if num_cars >= max_num_cars
+                break;
+            end
+            if generation_gap ~= 0
+                generation_gap = generation_gap - 1;
+                continue
+            end
             % generate vehicle with random speed rounded to nearest int
             speed = round(v_max * rand, 0);
             generation_gap = speed;
             c{1, j} = speed;
             num_cars = num_cars + 1;
-%         end
+        end
+    elseif strcmp(initialisation_method, 'naive')
+        %% Naive vehicle initialisation
+        naive_num_cars = 10; % set number of cars to be created using this naive method
+
+        for j = 1:m
+            % Check each step that we do not exceed our predetermined value
+            if num_cars >= naive_num_cars
+                break;
+            end
+            if generation_gap ~= 0
+                generation_gap = generation_gap - 1;
+                continue
+            end
+            % generate vehicle with random speed rounded to nearest int
+            speed = round(v_max * rand, 0);
+            generation_gap = speed;
+            c{1, j} = speed;
+            num_cars = num_cars + 1;
+        end
     end
     
     num_cars_array(k) = num_cars;
