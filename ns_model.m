@@ -30,14 +30,10 @@ num_cars_array = zeros(1, num_sims);
 missing_cars_array = zeros(1, num_sims);
 
 % Vehicle generation method
-% Options = 'random', 'naive', 'none'
-initialisation_method = 'naive';
+% Options = 'random', 'naive', 'static'
+initialisation_method = 'static';
 
-%% Previous static method of seeding cars 
-% num_cars = 3;
-% c{1, 2} = 3;
-% c{1, 6} = 1;
-% c{1, 9} = 1;
+
 
 % disp('Initial grid (t = 0)');
 % disp(c);
@@ -103,6 +99,12 @@ for k = 1:num_sims
             c{1, j} = speed;
             num_cars = num_cars + 1;
         end
+    elseif strcmp(initialisation_method, 'static')
+    %% Previous static method of seeding cars 
+        num_cars = 3;
+        c{1, 2} = 3;
+        c{1, 6} = 1;
+        c{1, 9} = 1;
     end
     
     num_cars_array(k) = num_cars;
