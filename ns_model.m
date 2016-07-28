@@ -1,6 +1,16 @@
 clc;
 clear;
 
+% add JIDT path -> Gives warning error
+% addpath('~/Documents/MATLAB/infodynamics-dist-1.3/infodynamics.jar')
+
+% add TRENTOOL path
+addpath('~/Documents/MATLAB/TRENTOOL3-master');
+
+% add Fieldtrip toolbox path
+addpath('~/Documents/MATLAB/fieldtrip-20160727');
+
+
 % debug flags
 verbose = false;
 
@@ -31,7 +41,7 @@ missing_cars_array = zeros(1, num_sims);
 
 % Vehicle generation method
 % Options = 'random', 'naive', 'static'
-initialisation_method = 'static';
+initialisation_method = 'random';
 
 
 
@@ -100,7 +110,9 @@ for k = 1:num_sims
             num_cars = num_cars + 1;
         end
     elseif strcmp(initialisation_method, 'static')
-    %% Previous static method of seeding cars 
+    %% Previous static method of seeding cars
+    % Good for replicating exact base/start conditions, not good for large
+    % sets
         num_cars = 3;
         c{1, 2} = 3;
         c{1, 6} = 1;
@@ -231,7 +243,10 @@ for k = 1:num_sims
 
     for i = 1:n
         if verbose fprintf('c{%d, 1}: %d', i, c{i, 1}); end
-        if c{i, 1} ~= ' ' && c{i, 1} > 0
+        % if cell isn't empty and cell speed is greater than 0
+        % why does it have to be greater than zero? if speed is zero it
+        % still takes up roadspace... 
+        if c{i, 1} ~= ' ' %&& c{i, 1} > 0
             tadsum = tadsum + c{i, 1};
             % should be:
             % sum = sum + 1;
@@ -281,7 +296,7 @@ for k = 1:num_sims
     
     % Save averages to an array
     time_average_density_array(k) = tad;
-    time_average_flow_array(k) = taf;
+    time_average_flow_array(k) = taf; 
     
     % Reset counter variables
     taf = 0;
@@ -298,5 +313,3 @@ num_cars_array_sorted = sort(num_cars_array);
 cell2csv('test.csv', c, ', ', 2013, '.');
 % cell2csv('tadseries.csv', tadseries, ', ', 2013, '.');
 % cell2csv('tafseries.csv', tafseries, ', ', 2013, '.');
-
-
