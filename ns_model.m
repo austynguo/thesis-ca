@@ -72,8 +72,7 @@ for k = 1:num_sims
         % Randomly generate a capped value for number of cars for this round
         % only. The aim is to ensure an even spread of simulations for a wide
         % range of vehicle numbers.
-        %% Check if INT rounding occurs properly!
-        max_num_cars = rand * m;
+        max_num_cars = floor(rand * m);
 
         for j = 1:m
             % Check each step that we do not exceed our predetermined value
@@ -248,7 +247,7 @@ for k = 1:num_sims
         % still takes up roadspace... 
         if c{i, 1} ~= ' ' %&& c{i, 1} > 0
             tadsum = tadsum + c{i, 1};
-            % should be:
+            % should be:   
             % sum = sum + 1;
     %         disp(sum);
             fprintf('Density at timestep %d: %d %f\n', i, c{i, 1}, c{i, 1}/n);
