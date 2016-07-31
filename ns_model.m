@@ -1,8 +1,9 @@
 clc;
 clear;
+clear java;
 
-% add JIDT path -> Gives warning error
-% addpath('~/Documents/MATLAB/infodynamics-dist-1.3/infodynamics.jar')
+% add JIDT path -> Gives warning error if ENTIRE filepath is not specified
+javaaddpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/infodynamics.jar')
 
 % add TRENTOOL path
 addpath('~/Documents/MATLAB/TRENTOOL3-master');
@@ -28,7 +29,7 @@ row_counter = 1;
 v_max = 3;
 
 % Number of simulation rounds
-num_sims = 10;
+num_sims = 1;
 
 % Pre-allocate array of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
