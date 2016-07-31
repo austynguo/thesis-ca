@@ -29,7 +29,7 @@ row_counter = 1;
 v_max = 3;
 
 % Number of simulation rounds
-num_sims = 1;
+num_sims = 100;
 
 % Pre-allocate array of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
@@ -243,16 +243,9 @@ for k = 1:num_sims
 
     for i = 1:n
         if verbose fprintf('c{%d, 1}: %d', i, c{i, 1}); end
-        % if cell isn't empty and cell speed is greater than 0
-        % why does it have to be greater than zero? if speed is zero it
-        % still takes up roadspace... 
-        if c{i, 1} ~= ' ' %&& c{i, 1} > 0
-            tadsum = tadsum + c{i, 1};
-            % should be:   
-            % sum = sum + 1;
-    %         disp(sum);
-            fprintf('Density at timestep %d: %d %f\n', i, c{i, 1}, c{i, 1}/n);
-            
+        % if cell is empty, add one to the total sum
+        if c{i, 1} ~= ' '
+            tadsum = tadsum + 1;
         end
         
         if verbose disp(tadsum); end
