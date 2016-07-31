@@ -28,16 +28,16 @@ row_counter = 1;
 v_max = 3;
 
 % Number of simulation rounds
-num_sims = 1;
+num_sims = 10;
 
 % Pre-allocate array of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
 
-time_average_flow_array = zeros(1, num_sims);
-time_average_density_array = zeros(1, num_sims);
+time_average_flow_array = zeros(num_sims, 1);
+time_average_density_array = zeros(num_sims, 1);
 
-num_cars_array = zeros(1, num_sims);
-missing_cars_array = zeros(1, num_sims);
+num_cars_array = zeros(num_sims, 1);
+missing_cars_array = zeros(num_sims, 1);
 
 % Vehicle generation method
 % Options = 'random', 'naive', 'static'
