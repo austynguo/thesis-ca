@@ -29,7 +29,7 @@ row_counter = 1;
 v_max = 3;
 
 % Number of simulation rounds
-num_sims = 100;
+num_sims = 5;
 
 % Pre-allocate array of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
@@ -142,7 +142,7 @@ for k = 1:num_sims
                 % else return 1
                 % Calculate gap to next vehicle thru recursive function
                 gap = recursegap(c, row_counter, i, m);
-                fprintf('Row: %d Gap: %d\n', row_counter, gap);
+                if verbose fprintf('Row: %d Gap: %d\n', row_counter, gap); end
 
                 %%% 1. ACCELERATION %%%
                 if gap > velocity + 1 && velocity < v_max
@@ -214,7 +214,7 @@ for k = 1:num_sims
                 % Probably not needed if random seeding is fixed
                 % loljks still need to write this
                 
-                fprintf('new velocity = %d\n', velocity);
+                if verbose fprintf('new velocity = %d\n', velocity); end
                 
                 %% Update car movement in the next row
                 c{row_counter + 1, newPosition} = velocity;
