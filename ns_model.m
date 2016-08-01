@@ -17,7 +17,7 @@ verbose = false;
 
 %% INITIALISATION
 % Initialise n by m grid of cells
-n = 100; %number of time steps
+n = 10000; %number of time steps
 m = 50; %length of 'road'
 c = cell(n, m); 
 
@@ -29,7 +29,7 @@ row_counter = 1;
 v_max = 3;
 
 % Number of simulation rounds
-num_sims = 5;
+num_sims = 1;
 
 % Pre-allocate array of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
@@ -45,6 +45,9 @@ missing_cars_array = zeros(num_sims, 1);
 initialisation_method = 'random';
 
 
+%% Flow & Density Value storage
+fnd_storage = zeros(num_sims, 3);
+
 
 % disp('Initial grid (t = 0)');
 % disp(c);
@@ -55,6 +58,7 @@ for k = 1:num_sims
     % might only need to initialise first row and then dynamically add rows
     % (dynamic allocation computationally expensive)
     for i = 1:n %down y
+        fnd_storage(i, 1) = i;
         for j = 1:m %right x
             c{i, j} = ' ';
         end
@@ -180,7 +184,7 @@ for k = 1:num_sims
                     if gap == velocity
                         % do nothing? or assign like below???
                     elseif gap + 1 == velocity
-                        velocity = velocity - 1;
+                        velocity = velocity - 1;                                                                                                                                                                                                                                       
                     else
                         velocity = min(velocity - 1, gap);
                     end
@@ -246,6 +250,9 @@ for k = 1:num_sims
         % if cell is empty, add one to the total sum
         if c{i, 1} ~= ' '
             tadsum = tadsum + 1;
+            
+            %% Experimental data
+            fnd_storage(i, 2) = 1;
         end
         
         if verbose disp(tadsum); end
@@ -278,6 +285,8 @@ for k = 1:num_sims
                 tafsum = tafsum + 1;
                 fprintf('Flow at timestep %d: %d %f\n', i, c{i+1, temp1}, c{i+1, temp1}/n);
                 
+                %% Experimental data
+                fnd_storage(i, 3) = c{i+1, temp1};
             end            
         end
         if verbose fprintf('Time Averaged Flow cumulative sum: ', tafsum); end
