@@ -17,7 +17,7 @@ verbose = false;
 
 %% INITIALISATION
 % Initialise n by m grid of cells
-n = 10000; %number of time steps
+n = 100; %number of time steps
 m = 50; %length of 'road'
 c = cell(n, m); 
 
@@ -77,7 +77,7 @@ for k = 1:num_sims
         % Randomly generate a capped value for number of cars for this round
         % only. The aim is to ensure an even spread of simulations for a wide
         % range of vehicle numbers.
-        max_num_cars = floor(rand * m);
+        max_num_cars = 5;
 
         for j = 1:m
             % Check each step that we do not exceed our predetermined value
@@ -315,3 +315,22 @@ num_cars_array_sorted = sort(num_cars_array);
 cell2csv('test.csv', c, ', ', 2013, '.');
 % cell2csv('tadseries.csv', tadseries, ', ', 2013, '.');
 % cell2csv('tafseries.csv', tafseries, ', ', 2013, '.');
+
+% %% Transfer Entropy Toolbox (JIDT)
+% % Generate some random binary data.
+% % Note that we need the *1 to make this a number not a Boolean,
+% %  otherwise this will not work (as it cannot match the method signature)
+% sourceArray=fnd_storage(:,2);
+% destArray = [0; sourceArray(1:99)];
+% sourceArray2=fnd_storage(:,3);
+% % Create a TE calculator and run it:
+% teCalc=javaObject('infodynamics.measures.discrete.TransferEntropyCalculatorDiscrete', 2, 1);
+% teCalc.initialise();
+% % Since we have simple arrays of doubles, we can directly pass these in:
+% teCalc.addObservations(sourceArray, destArray);
+% fprintf('\nFor copied source, result should be close to 1 bit : ');
+% result = teCalc.computeAverageLocalOfObservations()
+% teCalc.initialise();
+% teCalc.addObservations(sourceArray2, destArray);
+% fprintf('\nFor random source, result should be close to 0 bits: ');
+% result2 = teCalc.computeAverageLocalOfObservations()
