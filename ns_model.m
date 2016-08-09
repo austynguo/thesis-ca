@@ -130,13 +130,14 @@ for k = 1:num_sims
         for i = 1:m
             if (c{row_counter, i} >= 0 && c{row_counter, i} ~= ' ')
                 % Get current velocity
-                velocity = c{row_counter, i};
+%                 velocity = c{row_counter, i};
+                curr_velocity = c{row_counter, i};
                 
                 % set new velo = curr velo
                 % new_velocity = curr_velocity;
 
-                % print position out
-                if verbose fprintf('Position: %d\n', i); end
+                % print velocity, position out
+                if true fprintf('V: %d, row: %d Pos: %d\n', curr_velocity, row_counter, i); end
 
                 %%% CALCULATE GAP %%%
                 % pseudocode:
@@ -149,11 +150,11 @@ for k = 1:num_sims
                 if verbose fprintf('Row: %d Gap: %d\n', row_counter, gap); end
 
                 %%% 1. ACCELERATION %%%
-                if gap > velocity + 1 && velocity < v_max
+                if gap > curr_velocity + 1 && curr_velocity < v_max
                     % If gap greater than current velocity and under v_max,
                     % car can accelerate
                     % Increase velocity
-                    velocity = velocity + 1;
+                    new_velocity = curr_velocity + 1;
                     % testing ending if statement so each step is independent
                 end
                 
@@ -168,7 +169,7 @@ for k = 1:num_sims
                 % site i + j (with j =< v), it reduces its speed to
                 % j - 1 [v -> j - 1]
                 
-                if gap <= velocity && velocity ~= 0
+                if gap <= curr_velocity && curr_velocity ~= 0
                     % Otherwise if gap is LESS than the velocity value
                     % incremented by one and the velocity is NOT zero,
                     % decelerate the car
@@ -181,14 +182,14 @@ for k = 1:num_sims
                     
                     % set new velocity of vehicle as the smaller of two
                     % numbers
-                    if gap == velocity
+                    if gap == curr_velocity
                         % do nothing? or assign like below???
-                    elseif gap + 1 == velocity
-                        velocity = velocity - 1;                                                                                                                                                                                                                                       
+                    elseif gap + 1 == curr_velocity
+                        new_velocity = curr_velocity - 1;
                     else
-                        velocity = min(velocity - 1, gap);
+                        new_velocity = min(curr_velocity - 1, gap);
                     end
-                    if verbose fprintf('new_velocity: %d\n', velocity); end
+                    if verbose fprintf('new_velocity: %d\n', new_velocity); end
 
                 %%% 3. RANDOMISATION %%%
                 
@@ -197,20 +198,20 @@ for k = 1:num_sims
 %                 elseif velocity > 0
                 %% Make randomisation step independent from accel/deceleration
                 % i.e. it can accelerate and brake immediately
-                if velocity > 0 && velocity > 0
+                if curr_velocity > 0 && curr_velocity > 0
                     % if rand number less than p threshold, then reduce velocity
                     % probability p
                     p = 0.25;
 
-                    if rand < p && velocity ~= 0
-                        velocity = velocity - 1;
+                    if rand < p && curr_velocity ~= 0
+                        new_velocity = curr_velocity - 1;
                     end
                 end
 
                 %%% CAR MOTION %%%
                 % Check modulo and if road has wrapped properly (road is of
                 % length 'm')
-                newPosition = mod(i + velocity, m);
+                newPosition = mod(i + curr_velocity, m); %% CHECK IF NEW OR CURR VELO - Should be curr??
                 if newPosition == 0
                     newPosition = m;
                 end
@@ -218,10 +219,10 @@ for k = 1:num_sims
                 % Probably not needed if random seeding is fixed
                 % loljks still need to write this
                 
-                if verbose fprintf('new velocity = %d\n', velocity); end
+                if verbose fprintf('new velocity = %d\n', new_velocity); end
                 
                 %% Update car movement in the next row
-                c{row_counter + 1, newPosition} = velocity;
+                c{row_counter + 1, newPosition} = new_velocity;
             end
         end
     end
