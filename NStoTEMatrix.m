@@ -5,10 +5,16 @@
 function data = NStoTEMatrix(cellgrid, timesteps, roadLength)
     % Format: array(row, col)
     data = zeros(timesteps, roadLength);
+    % Parse through every cell in the grid
     for i = 1:timesteps % num timesteps
         for j = 1:roadLength % length of 'road'
+            % Store each cell in a temporary variable before writing it to
+            % the new matrix
             tempvar = cellgrid{i, j};
             fprintf('%d ',tempvar);
+            % If cell is an empty/unoccupied cell, assigned it a value of 2
+            % This is as JIDT doesn't allow for empty cells/matrix cells
+            %% [TODO: Confirm with Joe that this does not invalidate results]
             if tempvar == ' '
                 tempvar = 2;
             end
