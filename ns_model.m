@@ -342,21 +342,22 @@ addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave/Cellul
 addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave');
 
 
-options.plotOptions.plotRows = 100; % plot only 100 rows
-options.plotOptions.plotCols = 50; % plot only 50 columns
-options.plotOptions.plotStartRow = 1; % plot from row 100 onwards
-options.plotOptions.plotStartCol = 1; % plot from column 100 onwards
+options.plotOptions.plotRows = n; % number of timesteps
+options.plotOptions.plotCols = m; % length of road
+options.plotOptions.plotStartRow = 1; % plot from row # onwards
+options.plotOptions.plotStartCol = 1; % plot from column # onwards
 % input final cell state as calculated by prev code
 % NOT CORRECT -> not being parsed correctly
 % options.initialState = c; % <- legit will take anything and "work" (not throw errors) =/
 
+%% Values commented out below don't seem to affect JIDT code 
 neighbourhood = 3;
 base = 3; % this is as we have 3 states in the most basic model: an unoccupied space, velocity = 0 or 1
-rule = 30; %54?
-timesteps = 10; % this is the number of rows. 
+% rule = 30; %54?
+% timesteps = 10; % this is the number of rows. 
 measureId = 'active';
 measureParams.k = 1; % History length of 16 for info dynamics measures
-cells = m*n; % number of cells
+% cells = m*n; % number of cells
 
 % plotLocalInfoMeasureForCA(neighbourhood, base, rule, cells, timesteps, measureId, measureParams, options);
     
@@ -385,11 +386,11 @@ cells = m*n; % number of cells
 
 	%%====== Create here ======%%
 	%% Convert NS model data to feed into here
-	% Write a function -> Done
-	addpath('/home/austyn/Documents/MATLAB/thesis/');
+	% Call function that converts the cell data from the above NS model
+	% simulation into a matrix
 	caStates = NStoTEMatrix(c, 100, 50);
+    % outputs matrix
 	caStates
-
 
 
 	% convert the states to a format usable by java:
