@@ -389,7 +389,7 @@ measureParams.k = 1; % History length of 16 for info dynamics measures
 	% Call function that converts the cell data from the above NS model
 	% simulation into a matrix
 	caStates = NStoTEMatrix(c, 100, 50);
-    % outputs matrix
+    %% Outputs caStates matrix for TE calculation
 	caStates
 
 
