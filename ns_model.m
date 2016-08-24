@@ -628,4 +628,7 @@ measureParams.k = 1; % History length of 16 for info dynamics measures
 	if (not(plottedOne))
 		error(sprintf('Supplied measureId %s did not match any measurement types', measureId));
 	end
+%% Save ASCII text file of matrix
+% save('TEmatrix.txt', 'a', '-ASCII');
+dlmwrite('TEmatrix.txt', caStates, 'delimiter', ' ', 'precision', 1);
 
