@@ -11,8 +11,10 @@ addpath('~/Documents/MATLAB/TRENTOOL3-master');
 % add Fieldtrip toolbox path
 addpath('~/Documents/MATLAB/fieldtrip-20160727');
 
+%% === START System Parameters === %%
+% These system parameters can be edited
 
-% debug flags
+% Debug flags - set to true to print out debugging messages
 verbose = false;
 
 %% INITIALISATION
@@ -51,6 +53,11 @@ fnd_storage = zeros(num_sims, 3);
 
 % disp('Initial grid (t = 0)');
 % disp(c);
+
+%% Plot Transfer Entropy
+plotTE = false;
+
+%% === END System Parameters === %%
 
 %% START SIMULATION
 for k = 1:num_sims
@@ -335,300 +342,304 @@ cell2csv('test.csv', c, ', ', 2013, '.');
 % fprintf('\nFor random source, result should be close to 0 bits: ');
 % result2 = teCalc.computeAverageLocalOfObservations()
 
-
 %% CA Simulation
-% add paths to JIDT CA octave & matlab code
-addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave/CellularAutomata');
-addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave');
+if plotTE == true
+    % add paths to JIDT CA octave & matlab code
+    addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave/CellularAutomata');
+    addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave');
 
 
-options.plotOptions.plotRows = n; % number of timesteps
-options.plotOptions.plotCols = m; % length of road
-options.plotOptions.plotStartRow = 1; % plot from row # onwards
-options.plotOptions.plotStartCol = 1; % plot from column # onwards
-% input final cell state as calculated by prev code
-% NOT CORRECT -> not being parsed correctly
-% options.initialState = c; % <- legit will take anything and "work" (not throw errors) =/
+    options.plotOptions.plotRows = n; % number of timesteps
+    options.plotOptions.plotCols = m; % length of road
+    options.plotOptions.plotStartRow = 1; % plot from row # onwards
+    options.plotOptions.plotStartCol = 1; % plot from column # onwards
+    % input final cell state as calculated by prev code
+    % NOT CORRECT -> not being parsed correctly
+    % options.initialState = c; % <- legit will take anything and "work" (not throw errors) =/
 
-%% Values commented out below don't seem to affect JIDT code 
-neighbourhood = 3;
-base = 3; % this is as we have 3 states in the most basic model: an unoccupied space, velocity = 0 or 1
-% rule = 30; %54?
-% timesteps = 10; % this is the number of rows. 
-measureId = 'active';
-measureParams.k = 1; % History length of 16 for info dynamics measures
-% cells = m*n; % number of cells
+    %% Values commented out below don't seem to affect JIDT code 
 
-% plotLocalInfoMeasureForCA(neighbourhood, base, rule, cells, timesteps, measureId, measureParams, options);
-    
-	if not(isfield(options, 'plotOptions'))
-		options.plotOptions = {}; % Create it ready for plotRawCa etc
-	end
-	if not(isfield(options, 'saveImages'))
-		options.saveImages = false;
-	end
-	if not(isfield(options, 'saveImagesFormat'))
-		options.saveImagesFormat = 'eps';
-	end
-	if not(isfield(options, 'plotRawCa'))
-		options.plotRawCa = true;
-	end
-    
+    base = 3; % this is as we have 3 states in the most basic model: an unoccupied space, velocity = 0 or 1
+    % rule = 30; %54?
+    % timesteps = 10; % this is the number of rows. 
+    measureId = 'transfer';
+    measureParams.k = 1; % History length of 16 for info dynamics measures
 
-	if (strcmp(options.saveImagesFormat, 'eps'))
-		printDriver = 'epsc'; % to force colour
-		fontSize = 32;
-	else
-		printDriver = options.saveImagesFormat;
-		fontSize = 13;
-	end
-	figNum = 2;
+    %not sure if measureParams.j is right??
+    measureParams.j = 1;
 
-	%%====== Create here ======%%
-	%% Convert NS model data to feed into here
-	% Call function that converts the cell data from the above NS model
-	% simulation into a matrix
-	caStates = NStoTEMatrix(c, 100, 50);
-    %% Outputs caStates matrix for TE calculation
-	caStates
+    % cells = m*n; % number of cells
+
+    % plotLocalInfoMeasureForCA(neighbourhood, base, rule, cells, timesteps, measureId, measureParams, options);
+
+        if not(isfield(options, 'plotOptions'))
+            options.plotOptions = {}; % Create it ready for plotRawCa etc
+        end
+        if not(isfield(options, 'saveImages'))
+            options.saveImages = false;
+        end
+        if not(isfield(options, 'saveImagesFormat'))
+            options.saveImagesFormat = 'eps';
+        end
+        if not(isfield(options, 'plotRawCa'))
+            options.plotRawCa = true;
+        end
 
 
-	% convert the states to a format usable by java:
-	caStatesJInts = octaveToJavaIntMatrix(caStates);
-	
-	
-	plottedOne = false;
+        if (strcmp(options.saveImagesFormat, 'eps'))
+            printDriver = 'epsc'; % to force colour
+            fontSize = 32;
+        else
+            printDriver = options.saveImagesFormat;
+            fontSize = 13;
+        end
+        figNum = 2;
 
-	% Make the local information dynamics measurement(s)
-	
-	%============================
-	% Active information storage
-	if ((ischar(measureId) && (strcmpi('active', measureId) || strcmpi('all', measureId))) || ...
-	    (not(ischar(measureId)) && ((measureId == 0) || (measureId == -1))))
-		% Compute active information storage
-		activeCalc = javaObject('infodynamics.measures.discrete.ActiveInformationCalculatorDiscrete', base, measureParams.k);
-		activeCalc.initialise();
-		activeCalc.addObservations(caStatesJInts);
-		avActive = activeCalc.computeAverageLocalOfObservations();
-		fprintf('Average active information storage = %.4f\n', avActive);
-		javaLocalValues = activeCalc.computeLocalFromPreviousObservations(caStatesJInts);
-		localValues = javaMatrixToOctave(javaLocalValues);
-% 		if (isfield(options, 'movingFrameSpeed'))
-% 			% User has requested us to evaluate information dynamics with a moving frame of reference
-% 			% (see Lizier and Mahoney paper).
-% 			% Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
-% 			localValues = accumulateShift(localValues, options.movingFrameSpeed);
-% 		end
-		
-		figure(figNum)
-		figNum = figNum + 1;
-		plotLocalInfoValues(localValues, options.plotOptions);
-		if (options.saveImages)
-			set(gca, 'fontsize', fontSize);
-			colorbar('fontsize', fontSize);
-			print(sprintf('figures/%s-active-k%d.%s', ruleString, measureParams.k, options.saveImagesFormat), sprintf('-d%s', printDriver));
-		end
-		plottedOne = true;
-	end
-	
-	%============================
-	% Apparent transfer entropy
-	if ((ischar(measureId) && (strcmpi('transfer', measureId) || strcmpi('all', measureId) || strcmpi('apparenttransfer', measureId))) || ...
-	    (not(ischar(measureId)) && ((measureId == 1) || (measureId == -1))))
-		% Compute apparent transfer entropy
-		if (measureParams.j == 0)
-			error('Cannot compute transfer entropy from a cell to itself (setting measureParams.j == 0)');
-		end
-		transferCalc = javaObject('infodynamics.measures.discrete.TransferEntropyCalculatorDiscrete', base, measureParams.k);
-		transferCalc.initialise();
-		transferCalc.addObservations(caStatesJInts, measureParams.j);
-		avTransfer = transferCalc.computeAverageLocalOfObservations();
-		fprintf('Average apparent transfer entropy (j=%d) = %.4f\n', measureParams.j, avTransfer);
-		javaLocalValues = transferCalc.computeLocalFromPreviousObservations(caStatesJInts, measureParams.j);
-		localValues = javaMatrixToOctave(javaLocalValues);
-		if (isfield(options, 'movingFrameSpeed'))
-			% User has requested us to evaluate information dynamics with a moving frame of reference
-			% (see Lizier and Mahoney paper).
-			% Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
-			localValues = accumulateShift(localValues, options.movingFrameSpeed);
-		end
-		
-		figure(figNum)
-		figNum = figNum + 1;
-		plotLocalInfoValues(localValues, options.plotOptions);
-		if (options.saveImages)
-			set(gca, 'fontsize', fontSize);
-			colorbar('fontsize', fontSize);
-			print(sprintf('figures/%s-transfer-k%d-j%d.%s', ruleString, measureParams.k, measureParams.j, options.saveImagesFormat), sprintf('-d%s', printDriver));
-		end
-		plottedOne = true;
-	end
-	
-	%============================
-	% Complete transfer entropy, conditioning on all other sources
-	if ((ischar(measureId) && (strcmpi('transfercomplete', measureId) || strcmpi('completetransfer', measureId) || strcmpi('all', measureId))) || ...
-	    (not(ischar(measureId)) && ((measureId == 2) || (measureId == -1))))
-		% Compute complete transfer entropy
-		if (measureParams.j == 0)
-			error('Cannot compute transfer entropy from a cell to itself (setting measureParams.j == 0)');
-		end
-		transferCalc = javaObject('infodynamics.measures.discrete.ConditionalTransferEntropyCalculatorDiscrete', ...
-			base, measureParams.k, neighbourhood - 2);
-		transferCalc.initialise();
-		% Offsets of all parents can be included here - even 0 and j, these will be eliminated internally:
-		transferCalc.addObservations(caStatesJInts, measureParams.j, octaveToJavaIntArray(fullSetOfParents));
-		avTransfer = transferCalc.computeAverageLocalOfObservations();
-		fprintf('Average complete transfer entropy (j=%d) = %.4f\n', measureParams.j, avTransfer);
-		javaLocalValues = transferCalc.computeLocalFromPreviousObservations(caStatesJInts, ...
-					measureParams.j, octaveToJavaIntArray(fullSetOfParents));
-		localValues = javaMatrixToOctave(javaLocalValues);
-		if (isfield(options, 'movingFrameSpeed'))
-			% User has requested us to evaluate information dynamics with a moving frame of reference
-			% (see Lizier and Mahoney paper).
-			% Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
-			localValues = accumulateShift(localValues, options.movingFrameSpeed);
-		end
-		
-		figure(figNum)
-		figNum = figNum + 1;
-		plotLocalInfoValues(localValues, options.plotOptions);
-		if (options.saveImages)
-			set(gca, 'fontsize', fontSize);
-			colorbar('fontsize', fontSize);
-			print(sprintf('figures/%s-transferComp-k%d-j%d.%s', ruleString, measureParams.k, measureParams.j, options.saveImagesFormat), sprintf('-d%s', printDriver));
-		end
-		plottedOne = true;
-	end
-	
-	%============================
-	% Separable information
-	if ((ischar(measureId) && (strcmpi('separable', measureId) || strcmpi('all', measureId))) || ...
-	    (not(ischar(measureId)) && ((measureId == 3) || (measureId == -1))))
-		% Compute separable information
-		separableCalc = javaObject('infodynamics.measures.discrete.SeparableInfoCalculatorDiscrete', ...
-			base, measureParams.k, neighbourhood - 1);
-		separableCalc.initialise();
-		% Offsets of all parents can be included here - even 0 and j, these will be eliminated internally:
-		separableCalc.addObservations(caStatesJInts, octaveToJavaIntArray(fullSetOfParents));
-		avSeparable = separableCalc.computeAverageLocalOfObservations();
-		fprintf('Average separable information = %.4f\n', avSeparable);
-		javaLocalValues = separableCalc.computeLocalFromPreviousObservations(caStatesJInts, ...
-					octaveToJavaIntArray(fullSetOfParents));
-		localValues = javaMatrixToOctave(javaLocalValues);
-		if (isfield(options, 'movingFrameSpeed'))
-			% User has requested us to evaluate information dynamics with a moving frame of reference
-			% (see Lizier and Mahoney paper).
-			% Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
-			localValues = accumulateShift(localValues, options.movingFrameSpeed);
-		end
-		
-		figure(figNum)
-		figNum = figNum + 1;
-		plotLocalInfoValues(localValues, options.plotOptions);
-		if (options.saveImages)
-			set(gca, 'fontsize', fontSize);
-			colorbar('fontsize', fontSize);
-			print(sprintf('figures/%s-separable-k%d.%s', ruleString, measureParams.k, options.saveImagesFormat), sprintf('-d%s', printDriver));
-		end
-		plottedOne = true;
-	end
+        %%====== Create here ======%%
+        %% Convert NS model data to feed into here
+        % Call function that converts the cell data from the above NS model
+        % simulation into a matrix
+        caStates = NStoTEMatrix(c, 100, 50);
+        %% Outputs caStates matrix for TE calculation
+        caStates
 
-	%============================
-	% Entropy
-	if ((ischar(measureId) && (strcmpi('entropy', measureId) || strcmpi('all', measureId))) || ...
-	    (not(ischar(measureId)) && ((measureId == 4) || (measureId == -1))))
-		% Compute entropy
-		entropyCalc = javaObject('infodynamics.measures.discrete.EntropyCalculatorDiscrete', ...
-			base);
-		entropyCalc.initialise();
-		entropyCalc.addObservations(caStatesJInts);
-		avEntropy = entropyCalc.computeAverageLocalOfObservations();
-		fprintf('Average entropy = %.4f\n', avEntropy);
-		javaLocalValues = entropyCalc.computeLocalFromPreviousObservations(caStatesJInts);
-		localValues = javaMatrixToOctave(javaLocalValues);
-		if (isfield(options, 'movingFrameSpeed'))
-			% User has requested us to evaluate information dynamics with a moving frame of reference
-			% (see Lizier and Mahoney paper).
-			% Need to shift the computed info dynamics back (to compensate for earlier shift to CA states):
-			% (Note for entropy, the shifts to and back don't make any difference)
-			localValues = accumulateShift(localValues, options.movingFrameSpeed);
-		end
-		
-		figure(figNum)
-		figNum = figNum + 1;
-		plotLocalInfoValues(localValues, options.plotOptions);
-		if (options.saveImages)
-			set(gca, 'fontsize', fontSize);
-			colorbar('fontsize', fontSize);
-			print(sprintf('figures/%s-entropy.%s', ruleString, options.saveImagesFormat), sprintf('-d%s', printDriver));
-		end
-		plottedOne = true;
-	end
 
-	%============================
-	% Entropy rate
-	if ((ischar(measureId) && (strcmpi('entropyrate', measureId) || strcmpi('all', measureId))) || ...
-	    (not(ischar(measureId)) && ((measureId == 5) || (measureId == -1))))
-		% Compute entropy rate
-		entRateCalc = javaObject('infodynamics.measures.discrete.EntropyRateCalculatorDiscrete', base, measureParams.k);
-		entRateCalc.initialise();
-		entRateCalc.addObservations(caStatesJInts);
-		avEntRate = entRateCalc.computeAverageLocalOfObservations();
-		fprintf('Average entropy rate = %.4f\n', avEntRate);
-		javaLocalValues = entRateCalc.computeLocalFromPreviousObservations(caStatesJInts);
-		localValues = javaMatrixToOctave(javaLocalValues);
-		if (isfield(options, 'movingFrameSpeed'))
-			% User has requested us to evaluate information dynamics with a moving frame of reference
-			% (see Lizier and Mahoney paper).
-			% Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
-			localValues = accumulateShift(localValues, options.movingFrameSpeed);
-		end
-		
-		figure(figNum)
-		figNum = figNum + 1;
-		plotLocalInfoValues(localValues, options.plotOptions);
-		if (options.saveImages)
-			set(gca, 'fontsize', fontSize);
-			colorbar('fontsize', fontSize);
-			print(sprintf('figures/%s-entrate-k%d.%s', ruleString, measureParams.k, options.saveImagesFormat), sprintf('-d%s', printDriver));
-		end
-		plottedOne = true;
-	end
-	
-	%============================
-	% Excess entropy
-	if ((ischar(measureId) && (strcmpi('excess', measureId) || strcmpi('all', measureId))) || ...
-	    (not(ischar(measureId)) && ((measureId == 6) || (measureId == -1))))
-		% Compute excess entropy
-		excessEntropyCalc = javaObject('infodynamics.measures.discrete.PredictiveInformationCalculatorDiscrete', base, measureParams.k);
-		excessEntropyCalc.initialise();
-		excessEntropyCalc.addObservations(caStatesJInts);
-		avExcessEnt = excessEntropyCalc.computeAverageLocalOfObservations();
-		fprintf('Average excess entropy = %.4f\n', avExcessEnt);
-		javaLocalValues = excessEntropyCalc.computeLocalFromPreviousObservations(caStatesJInts);
-		localValues = javaMatrixToOctave(javaLocalValues);
-		if (isfield(options, 'movingFrameSpeed'))
-			% User has requested us to evaluate information dynamics with a moving frame of reference
-			% (see Lizier and Mahoney paper).
-			% Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
-			localValues = accumulateShift(localValues, options.movingFrameSpeed);
-		end
-		
-		figure(figNum)
-		figNum = figNum + 1;
-		plotLocalInfoValues(localValues, options.plotOptions);
-		if (options.saveImages)
-			set(gca, 'fontsize', fontSize);
-			colorbar('fontsize', fontSize);
-			print(sprintf('figures/%s-excessentropy-k%d.%s', ruleString, measureParams.k, options.saveImagesFormat), sprintf('-d%s', printDriver));
-		end
-		plottedOne = true;
-	end
+        % convert the states to a format usable by java:
+        caStatesJInts = octaveToJavaIntMatrix(caStates);
 
-	if (not(plottedOne))
-		error(sprintf('Supplied measureId %s did not match any measurement types', measureId));
-	end
-%% Save ASCII text file of matrix
-% save('TEmatrix.txt', 'a', '-ASCII');
-dlmwrite('TEmatrix.txt', caStates, 'delimiter', ' ', 'precision', 1);
 
+        plottedOne = false;
+
+        % Make the local information dynamics measurement(s)
+
+        %============================
+        % Active information storage
+        if ((ischar(measureId) && (strcmpi('active', measureId) || strcmpi('all', measureId))) || ...
+            (not(ischar(measureId)) && ((measureId == 0) || (measureId == -1))))
+            % Compute active information storage
+            activeCalc = javaObject('infodynamics.measures.discrete.ActiveInformationCalculatorDiscrete', base, measureParams.k);
+            activeCalc.initialise();
+            activeCalc.addObservations(caStatesJInts);
+            avActive = activeCalc.computeAverageLocalOfObservations();
+            fprintf('Average active information storage = %.4f\n', avActive);
+            javaLocalValues = activeCalc.computeLocalFromPreviousObservations(caStatesJInts);
+            localValues = javaMatrixToOctave(javaLocalValues);
+    % 		if (isfield(options, 'movingFrameSpeed'))
+    % 			% User has requested us to evaluate information dynamics with a moving frame of reference
+    % 			% (see Lizier and Mahoney paper).
+    % 			% Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
+    % 			localValues = accumulateShift(localValues, options.movingFrameSpeed);
+    % 		end
+
+            figure(figNum)
+            figNum = figNum + 1;
+            plotLocalInfoValues(localValues, options.plotOptions);
+            if (options.saveImages)
+                set(gca, 'fontsize', fontSize);
+                colorbar('fontsize', fontSize);
+                print(sprintf('figures/%s-active-k%d.%s', ruleString, measureParams.k, options.saveImagesFormat), sprintf('-d%s', printDriver));
+            end
+            plottedOne = true;
+        end
+
+        %============================
+        % Apparent transfer entropy
+        if ((ischar(measureId) && (strcmpi('transfer', measureId) || strcmpi('all', measureId) || strcmpi('apparenttransfer', measureId))) || ...
+            (not(ischar(measureId)) && ((measureId == 1) || (measureId == -1))))
+            % Compute apparent transfer entropy
+            if (measureParams.j == 0)
+                error('Cannot compute transfer entropy from a cell to itself (setting measureParams.j == 0)');
+            end
+            transferCalc = javaObject('infodynamics.measures.discrete.TransferEntropyCalculatorDiscrete', base, measureParams.k);
+            transferCalc.initialise();
+            transferCalc.addObservations(caStatesJInts, measureParams.j);
+            avTransfer = transferCalc.computeAverageLocalOfObservations();
+            fprintf('Average apparent transfer entropy (j=%d) = %.4f\n', measureParams.j, avTransfer);
+            javaLocalValues = transferCalc.computeLocalFromPreviousObservations(caStatesJInts, measureParams.j);
+            localValues = javaMatrixToOctave(javaLocalValues);
+            if (isfield(options, 'movingFrameSpeed'))
+                % User has requested us to evaluate information dynamics with a moving frame of reference
+                % (see Lizier and Mahoney paper).
+                % Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
+                localValues = accumulateShift(localValues, options.movingFrameSpeed);
+            end
+
+            figure(figNum)
+            figNum = figNum + 1;
+            plotLocalInfoValues(localValues, options.plotOptions);
+            if (options.saveImages)
+                set(gca, 'fontsize', fontSize);
+                colorbar('fontsize', fontSize);
+                print(sprintf('figures/%s-transfer-k%d-j%d.%s', ruleString, measureParams.k, measureParams.j, options.saveImagesFormat), sprintf('-d%s', printDriver));
+            end
+            plottedOne = true;
+        end
+
+        %============================
+        % Complete transfer entropy, conditioning on all other sources
+        if ((ischar(measureId) && (strcmpi('transfercomplete', measureId) || strcmpi('completetransfer', measureId) || strcmpi('all', measureId))) || ...
+            (not(ischar(measureId)) && ((measureId == 2) || (measureId == -1))))
+            % Compute complete transfer entropy
+            if (measureParams.j == 0)
+                error('Cannot compute transfer entropy from a cell to itself (setting measureParams.j == 0)');
+            end
+            transferCalc = javaObject('infodynamics.measures.discrete.ConditionalTransferEntropyCalculatorDiscrete', ...
+                base, measureParams.k, neighbourhood - 2);
+            transferCalc.initialise();
+            % Offsets of all parents can be included here - even 0 and j, these will be eliminated internally:
+            transferCalc.addObservations(caStatesJInts, measureParams.j, octaveToJavaIntArray(fullSetOfParents));
+            avTransfer = transferCalc.computeAverageLocalOfObservations();
+            fprintf('Average complete transfer entropy (j=%d) = %.4f\n', measureParams.j, avTransfer);
+            javaLocalValues = transferCalc.computeLocalFromPreviousObservations(caStatesJInts, ...
+                        measureParams.j, octaveToJavaIntArray(fullSetOfParents));
+            localValues = javaMatrixToOctave(javaLocalValues);
+            if (isfield(options, 'movingFrameSpeed'))
+                % User has requested us to evaluate information dynamics with a moving frame of reference
+                % (see Lizier and Mahoney paper).
+                % Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
+                localValues = accumulateShift(localValues, options.movingFrameSpeed);
+            end
+
+            figure(figNum)
+            figNum = figNum + 1;
+            plotLocalInfoValues(localValues, options.plotOptions);
+            if (options.saveImages)
+                set(gca, 'fontsize', fontSize);
+                colorbar('fontsize', fontSize);
+                print(sprintf('figures/%s-transferComp-k%d-j%d.%s', ruleString, measureParams.k, measureParams.j, options.saveImagesFormat), sprintf('-d%s', printDriver));
+            end
+            plottedOne = true;
+        end
+
+        %============================
+        % Separable information
+        if ((ischar(measureId) && (strcmpi('separable', measureId) || strcmpi('all', measureId))) || ...
+            (not(ischar(measureId)) && ((measureId == 3) || (measureId == -1))))
+            % Compute separable information
+            separableCalc = javaObject('infodynamics.measures.discrete.SeparableInfoCalculatorDiscrete', ...
+                base, measureParams.k, neighbourhood - 1);
+            separableCalc.initialise();
+            % Offsets of all parents can be included here - even 0 and j, these will be eliminated internally:
+            separableCalc.addObservations(caStatesJInts, octaveToJavaIntArray(fullSetOfParents));
+            avSeparable = separableCalc.computeAverageLocalOfObservations();
+            fprintf('Average separable information = %.4f\n', avSeparable);
+            javaLocalValues = separableCalc.computeLocalFromPreviousObservations(caStatesJInts, ...
+                        octaveToJavaIntArray(fullSetOfParents));
+            localValues = javaMatrixToOctave(javaLocalValues);
+            if (isfield(options, 'movingFrameSpeed'))
+                % User has requested us to evaluate information dynamics with a moving frame of reference
+                % (see Lizier and Mahoney paper).
+                % Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
+                localValues = accumulateShift(localValues, options.movingFrameSpeed);
+            end
+
+            figure(figNum)
+            figNum = figNum + 1;
+            plotLocalInfoValues(localValues, options.plotOptions);
+            if (options.saveImages)
+                set(gca, 'fontsize', fontSize);
+                colorbar('fontsize', fontSize);
+                print(sprintf('figures/%s-separable-k%d.%s', ruleString, measureParams.k, options.saveImagesFormat), sprintf('-d%s', printDriver));
+            end
+            plottedOne = true;
+        end
+
+        %============================
+        % Entropy
+        if ((ischar(measureId) && (strcmpi('entropy', measureId) || strcmpi('all', measureId))) || ...
+            (not(ischar(measureId)) && ((measureId == 4) || (measureId == -1))))
+            % Compute entropy
+            entropyCalc = javaObject('infodynamics.measures.discrete.EntropyCalculatorDiscrete', ...
+                base);
+            entropyCalc.initialise();
+            entropyCalc.addObservations(caStatesJInts);
+            avEntropy = entropyCalc.computeAverageLocalOfObservations();
+            fprintf('Average entropy = %.4f\n', avEntropy);
+            javaLocalValues = entropyCalc.computeLocalFromPreviousObservations(caStatesJInts);
+            localValues = javaMatrixToOctave(javaLocalValues);
+            if (isfield(options, 'movingFrameSpeed'))
+                % User has requested us to evaluate information dynamics with a moving frame of reference
+                % (see Lizier and Mahoney paper).
+                % Need to shift the computed info dynamics back (to compensate for earlier shift to CA states):
+                % (Note for entropy, the shifts to and back don't make any difference)
+                localValues = accumulateShift(localValues, options.movingFrameSpeed);
+            end
+
+            figure(figNum)
+            figNum = figNum + 1;
+            plotLocalInfoValues(localValues, options.plotOptions);
+            if (options.saveImages)
+                set(gca, 'fontsize', fontSize);
+                colorbar('fontsize', fontSize);
+                print(sprintf('figures/%s-entropy.%s', ruleString, options.saveImagesFormat), sprintf('-d%s', printDriver));
+            end
+            plottedOne = true;
+        end
+
+        %============================
+        % Entropy rate
+        if ((ischar(measureId) && (strcmpi('entropyrate', measureId) || strcmpi('all', measureId))) || ...
+            (not(ischar(measureId)) && ((measureId == 5) || (measureId == -1))))
+            % Compute entropy rate
+            entRateCalc = javaObject('infodynamics.measures.discrete.EntropyRateCalculatorDiscrete', base, measureParams.k);
+            entRateCalc.initialise();
+            entRateCalc.addObservations(caStatesJInts);
+            avEntRate = entRateCalc.computeAverageLocalOfObservations();
+            fprintf('Average entropy rate = %.4f\n', avEntRate);
+            javaLocalValues = entRateCalc.computeLocalFromPreviousObservations(caStatesJInts);
+            localValues = javaMatrixToOctave(javaLocalValues);
+            if (isfield(options, 'movingFrameSpeed'))
+                % User has requested us to evaluate information dynamics with a moving frame of reference
+                % (see Lizier and Mahoney paper).
+                % Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
+                localValues = accumulateShift(localValues, options.movingFrameSpeed);
+            end
+
+            figure(figNum)
+            figNum = figNum + 1;
+            plotLocalInfoValues(localValues, options.plotOptions);
+            if (options.saveImages)
+                set(gca, 'fontsize', fontSize);
+                colorbar('fontsize', fontSize);
+                print(sprintf('figures/%s-entrate-k%d.%s', ruleString, measureParams.k, options.saveImagesFormat), sprintf('-d%s', printDriver));
+            end
+            plottedOne = true;
+        end
+
+        %============================
+        % Excess entropy
+        if ((ischar(measureId) && (strcmpi('excess', measureId) || strcmpi('all', measureId))) || ...
+            (not(ischar(measureId)) && ((measureId == 6) || (measureId == -1))))
+            % Compute excess entropy
+            excessEntropyCalc = javaObject('infodynamics.measures.discrete.PredictiveInformationCalculatorDiscrete', base, measureParams.k);
+            excessEntropyCalc.initialise();
+            excessEntropyCalc.addObservations(caStatesJInts);
+            avExcessEnt = excessEntropyCalc.computeAverageLocalOfObservations();
+            fprintf('Average excess entropy = %.4f\n', avExcessEnt);
+            javaLocalValues = excessEntropyCalc.computeLocalFromPreviousObservations(caStatesJInts);
+            localValues = javaMatrixToOctave(javaLocalValues);
+            if (isfield(options, 'movingFrameSpeed'))
+                % User has requested us to evaluate information dynamics with a moving frame of reference
+                % (see Lizier and Mahoney paper).
+                % Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
+                localValues = accumulateShift(localValues, options.movingFrameSpeed);
+            end
+
+            figure(figNum)
+            figNum = figNum + 1;
+            plotLocalInfoValues(localValues, options.plotOptions);
+            if (options.saveImages)
+                set(gca, 'fontsize', fontSize);
+                colorbar('fontsize', fontSize);
+                print(sprintf('figures/%s-excessentropy-k%d.%s', ruleString, measureParams.k, options.saveImagesFormat), sprintf('-d%s', printDriver));
+            end
+            plottedOne = true;
+        end
+
+        if (not(plottedOne))
+            error(sprintf('Supplied measureId %s did not match any measurement types', measureId));
+        end
+    %% Save ASCII text file of matrix
+    % save('TEmatrix.txt', 'a', '-ASCII');
+    dlmwrite('TEmatrix.txt', caStates, 'delimiter', ' ', 'precision', 1);
+end
