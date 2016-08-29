@@ -86,7 +86,7 @@ for k = 1:num_sims
         % Randomly generate a capped value for number of cars for this round
         % only. The aim is to ensure an even spread of simulations for a wide
         % range of vehicle numbers.
-        max_num_cars = 10;
+        max_num_cars = rand * m;
 
         for j = 1:m
             % Check each step that we do not exceed our predetermined value
