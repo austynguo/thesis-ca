@@ -290,7 +290,7 @@ for k = 1:num_sims
                 temp1 = m;
             end
 
-            if c{i+1, temp1} ~= ' ' && c{i+1, temp1} > j 
+            if c{i+1, temp1} ~= ' ' && c{i+1, temp1} >= j
                 tafsum = tafsum + 1;
                 fprintf('Flow at timestep %d: %d %f\n', i, c{i+1, temp1}, c{i+1, temp1}/n);
                 
