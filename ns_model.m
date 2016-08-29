@@ -11,21 +11,18 @@ addpath('~/Documents/MATLAB/TRENTOOL3-master');
 % add Fieldtrip toolbox path
 addpath('~/Documents/MATLAB/fieldtrip-20160727');
 
-%% === START System Parameters === %%
-% These system parameters can be edited
+%% === START Variable System Parameters === %%
+% These 'variable' initial system parameters can be edited to change the outcome
+% of the simulation
 
 % Debug flags - set to true to print out debugging messages
 verbose = false;
 
 %% INITIALISATION
-% Initialise n by m grid of cells
+% Initialise size n by m grid of cells
 n = 100; %number of time steps
 m = 50; %length of 'road'
-c = cell(n, m); 
-
-
-% Initialise variable to track which row we are up to
-row_counter = 1;
+c = cell(n, m);
 
 % Maximum Velocity
 v_max = 1;
@@ -33,31 +30,36 @@ v_max = 1;
 % Number of simulation rounds
 num_sims = 1;
 
+% Vehicle generation method
+% Options = 'random', 'naive', 'static'
+initialisation_method = 'random';
+
+%% Simulation mode
+% Choose mode: 'single' or 'multiple'
+simulationMode = 'single';
+
+%% Plot Transfer Entropy
+plotTE = false;
+
+%% === END Variable System Parameters === %%
+
+% Initialise variable to track which row we are up to
+row_counter = 1;
+
+% disp('Initial grid (t = 0)');
+% disp(c);
+
+% Flow & Density Value storage
+fnd_storage = zeros(num_sims, 3);
+
 % Pre-allocate array of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
-
 time_average_flow_array = zeros(num_sims, 1);
 time_average_density_array = zeros(num_sims, 1);
 
 num_cars_array = zeros(num_sims, 1);
 missing_cars_array = zeros(num_sims, 1);
 
-% Vehicle generation method
-% Options = 'random', 'naive', 'static'
-initialisation_method = 'random';
-
-
-%% Flow & Density Value storage
-fnd_storage = zeros(num_sims, 3);
-
-
-% disp('Initial grid (t = 0)');
-% disp(c);
-
-%% Plot Transfer Entropy
-plotTE = false;
-
-%% === END System Parameters === %%
 
 %% START SIMULATION
 for k = 1:num_sims
@@ -294,7 +296,7 @@ for k = 1:num_sims
                 
                 %% Experimental data
                 fnd_storage(i, 3) = c{i+1, temp1};
-            end            
+            end
         end
         if verbose fprintf('Time Averaged Flow cumulative sum: ', tafsum); end
     end
