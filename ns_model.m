@@ -93,20 +93,22 @@ for k = 1:num_sims
         % Randomly generate a capped value for number of cars for this round
         % only. The aim is to ensure an even spread of simulations for a wide
         % range of vehicle numbers.
-        max_num_cars = rand * m;
+        max_num_cars = round(rand * m);
 
         for j = 1:m
             % Check each step that we do not exceed our predetermined value
             if num_cars >= max_num_cars
                 break;
             end
-            if generation_gap ~= 0
-                generation_gap = generation_gap - 1;
-                continue
-            end
+            %% Commented out code seems to fix the random car generation
+            %% i.e. Random num of cars chosen for each simulation is now evenly distributed
+%             if generation_gap ~= 0
+%                 generation_gap = generation_gap - 1;
+%                 continue
+%             end
             % generate vehicle with random speed rounded to nearest int
             speed = round(v_max * rand, 0);
-            generation_gap = speed;
+%             generation_gap = speed;
             c{1, j} = speed;
             num_cars = num_cars + 1;
         end
