@@ -3,6 +3,8 @@
 % to a matrix (array) format that is required by the JIDT Toolkit for the 
 % calculation of Transfer Entropy and related meaures
 function data = NStoTEMatrix(cellgrid, timesteps, roadLength, v_max)
+    print = false; %enable or disable printing values to console.
+
     % Format: array(row, col)
     data = zeros(timesteps, roadLength);
     % Parse through every cell in the grid
@@ -11,7 +13,7 @@ function data = NStoTEMatrix(cellgrid, timesteps, roadLength, v_max)
             % Store each cell in a temporary variable before writing it to
             % the new matrix
             tempvar = cellgrid{i, j};
-            fprintf('%d ',tempvar);
+            if print == true fprintf('%d ',tempvar); end
             % If cell is an empty/unoccupied cell, assigned it a value of 2
             % This is as JIDT doesn't allow for empty cells/matrix cells
             %% [TODO: Confirm with Joe that this does not invalidate results]
@@ -24,7 +26,7 @@ function data = NStoTEMatrix(cellgrid, timesteps, roadLength, v_max)
             end
             data(i, j) = tempvar;
         end
-        fprintf('\n');
+        if print == true fprintf('\n'); end
     end
 %     cell2csv('converted_NS_data.csv', data, ', ', 2013, '.');
 %     data
