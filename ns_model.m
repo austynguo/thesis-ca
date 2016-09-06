@@ -243,7 +243,7 @@ for k = 1:num_sims
     end
 
     %% Print grid after t timesteps
-    fprintf('After %d timesteps (t = 10)\n', n);
+    fprintf('After %d timesteps (t = %d)\n', n, n);
     disp(c);
 
     %% Detect missing cars:
