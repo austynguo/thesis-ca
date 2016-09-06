@@ -405,7 +405,8 @@ if plotTE == true
 
     %% Values commented out below don't seem to affect JIDT code 
 
-    base = 3; % this is as we have 3 states in the most basic model: an unoccupied space, velocity = 0 or 1
+    % base = 3; % this is as we have 3 states in the most basic model: an unoccupied space, velocity = 0 or 1
+    base = v_max + 2; % This allows for the multiple states
     % rule = 30; %54?
     % timesteps = 10; % this is the number of rows. 
     measureId = 'transfer';
@@ -445,7 +446,7 @@ if plotTE == true
         %% Convert NS model data to feed into here
         % Call function that converts the cell data from the above NS model
         % simulation into a matrix
-        caStates = NStoTEMatrix(c, 100, 50);
+        caStates = NStoTEMatrix(c, 100, 50, v_max);
         %% Outputs caStates matrix for TE calculation
         caStates
 
