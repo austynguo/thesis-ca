@@ -38,8 +38,15 @@ initialisation_method = 'random';
 % Choose mode: 'single' or 'multiple'
 simulationMode = 'single';
 
-%% Plot Transfer Entropy
-plotTE = false;
+% Number of simulation rounds
+num_sims = 1;
+
+%% Plot graph of multiple simulations
+plotGraph = false;
+
+%% Plot Transfer Entropy (single simulation only)
+plotTE = true;
+
 
 %% === END Variable System Parameters === %%
 
@@ -324,6 +331,43 @@ num_cars_array_sorted = sort(num_cars_array);
 cell2csv('test.csv', c, ', ', 2013, '.');
 % cell2csv('tadseries.csv', tadseries, ', ', 2013, '.');
 % cell2csv('tafseries.csv', tafseries, ', ', 2013, '.');
+
+
+
+%% Plotter
+if plotGraph == true
+    figure
+    % subplot(3,1,2)
+    % scatter(time_average_density_array, time_average_flow_array, 'filled');
+    % title('Averaged Density vs Flow')
+    % xlabel('Time Averaged Density')
+    % ylabel('Time Averaged Flow')
+
+    subplot(3,2,1)
+    bar(num_cars_array_sorted);
+    title('Cars per simulation - Sorted (Ascending)')
+    xlabel('Number of simulations run')
+    ylabel('Number of cars')
+    xlim([0 num_sims])
+
+
+    timeAveragedData = sortrows([time_average_density_array time_average_flow_array], 1);
+
+    subplot(3,2,[3 6])
+    % Filter line
+    % windowSize = num_sims/5;
+    % yy = filter(ones(1,windowSize)/windowSize,1, timeAveragedData(:, 2));
+
+    yy = smooth(timeAveragedData(:, 1), timeAveragedData(:, 2), 0.1, 'rlowess');
+    plot(timeAveragedData(:, 1),timeAveragedData(:, 2),'b.',timeAveragedData(:, 1),yy,'r-');
+    % set(gca);
+    legend('Original Data','Smoothed Data Using ''rloess''', 'Location','NW');
+    title('Averaged Density vs Flow')
+    xlabel('Time Averaged Density')
+    ylabel('Time Averaged Flow')
+end
+
+
 
 %% Transfer Entropy Toolbox (JIDT)
 % % Generate some random binary data.
