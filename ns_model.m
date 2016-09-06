@@ -399,25 +399,13 @@ if plotTE == true
     options.plotOptions.plotCols = m; % length of road
     options.plotOptions.plotStartRow = 1; % plot from row # onwards
     options.plotOptions.plotStartCol = 1; % plot from column # onwards
-    % input final cell state as calculated by prev code
-    % NOT CORRECT -> not being parsed correctly
-    % options.initialState = c; % <- legit will take anything and "work" (not throw errors) =/
 
-    %% Values commented out below don't seem to affect JIDT code 
-
-    % base = 3; % this is as we have 3 states in the most basic model: an unoccupied space, velocity = 0 or 1
     base = v_max + 2; % This allows for the multiple states
-    % rule = 30; %54?
-    % timesteps = 10; % this is the number of rows. 
     measureId = 'transfer';
     measureParams.k = 1; % History length of 16 for info dynamics measures
 
     %not sure if measureParams.j is right??
     measureParams.j = 1;
-
-    % cells = m*n; % number of cells
-
-    % plotLocalInfoMeasureForCA(neighbourhood, base, rule, cells, timesteps, measureId, measureParams, options);
 
         if not(isfield(options, 'plotOptions'))
             options.plotOptions = {}; % Create it ready for plotRawCa etc
