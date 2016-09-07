@@ -345,16 +345,21 @@ cell2csv('test.csv', c, ', ', 2013, '.');
 % cell2csv('tadseries.csv', tadseries, ', ', 2013, '.');
 % cell2csv('tafseries.csv', tafseries, ', ', 2013, '.');
 
-timeAveragedData = zeros(num_sims, max_n/10);
 
-for i = 1:system_size_counter
-    colNum = i*2;
-    timeAveragedData(1:num_sims, colNum-1:colNum) = sortrows([time_average_density_array(:, i) time_average_flow_array(:, i)], 1);
-end
 
 
 %% Plotter
 if plotGraph == true
+    % initialise array
+    timeAveragedData = zeros(num_sims, max_n/10);
+
+    % Sort flow & density for each simulation across multiple system sizes
+    % and store them in an array
+    for i = 1:system_size_counter
+        colNum = i*2;
+        timeAveragedData(1:num_sims, colNum-1:colNum) = sortrows([time_average_density_array(:, i) time_average_flow_array(:, i)], 1);
+    end
+    
     figure
     % subplot(3,1,2)
     % scatter(time_average_density_array, time_average_flow_array, 'filled');
