@@ -491,7 +491,8 @@ if plotTE == true
     %% Convert NS model data to feed into here
     % Call function that converts the cell data from the above NS model
     % simulation into a matrix
-    caStates = NStoTEMatrix(c, 100, 50, v_max);
+    % NStoTEMatrix.m arguments: NStoTEMatrix(cellgrid, timesteps, roadLength, max_velocity)
+    caStates = NStoTEMatrix(c, n, m, v_max);
     %% Outputs caStates matrix for TE calculation
     caStates
 
