@@ -327,16 +327,6 @@ for h = 1:max_n/10:max_n+1
     end
 end
 
-% sort number of cars for easy graph reading
-num_cars_array_sorted = sort(num_cars_array);
-
-
-%% Export final cell array to csv format
-cell2csv('test.csv', c, ', ', 2013, '.');
-% cell2csv('tadseries.csv', tadseries, ', ', 2013, '.');
-% cell2csv('tafseries.csv', tafseries, ', ', 2013, '.');
-
-
 
 
 %% Transfer Entropy Toolbox (JIDT)
@@ -710,4 +700,14 @@ if plotGraph == true
     xlabel('Time Averaged Density')
     ylabel('Time Averaged Flow')
 end
+
+
+% sort number of cars for easy graph reading
+num_cars_array_sorted = sort(num_cars_array);
+
+
+%% Export final cell array to csv format
+cell2csv('test.csv', c, ', ', 2013, '.');
+% cell2csv('tadseries.csv', tadseries, ', ', 2013, '.');
+% cell2csv('tafseries.csv', tafseries, ', ', 2013, '.');
 
