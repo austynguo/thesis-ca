@@ -670,6 +670,9 @@ if plotGraph == true
     % title('Averaged Density vs Flow')
     % xlabel('Time Averaged Density')
     % ylabel('Time Averaged Flow')
+        
+    % sort number of cars for easy graph reading
+    num_cars_array_sorted = sort(num_cars_array);
 
     subplot(3,2,1)
     bar(num_cars_array_sorted);
@@ -727,10 +730,6 @@ if plotGraph == true
     xlabel('Time Averaged Density')
     ylabel('Time Averaged Flow')
 end
-
-
-% sort number of cars for easy graph reading
-num_cars_array_sorted = sort(num_cars_array);
 
 
 %% Export final cell array to csv format
