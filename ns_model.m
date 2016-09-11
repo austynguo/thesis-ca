@@ -64,6 +64,8 @@ smoothed_simulation_data = zeros(num_sims, max_n/10);
 
 system_size_counter = 0; % probs not needed
 
+average_TE_array = zeros(num_sims, max_n/10);
+
 %% START SIMULATION
 for h = 1:max_n/10:max_n+1
     n = h; % set n (the road length) in each loop
@@ -435,7 +437,7 @@ for h = 1:max_n/10:max_n+1
                 fprintf('Average apparent transfer entropy (j=%d) = %.4f\n', measureParams.j, avTransfer);
 
                 % Store average apparent TE
-        %         average_TE_array(1);
+                average_TE_array(k, system_size_counter) = avTransfer;
 
                 if plotTE == true
                     javaLocalValues = transferCalc.computeLocalFromPreviousObservations(caStatesJInts, measureParams.j);
