@@ -64,7 +64,7 @@ smoothed_simulation_data = zeros(num_sims, max_n/10);
 system_size_counter = 0; % probs not needed
 
 %% START SIMULATION
-for h = 1:max_n/10:max_n
+for h = 1:max_n/10:max_n+1
     n = h; % set n (the road length) in each loop
     system_size_counter = system_size_counter + 1; %increment one on each loop
     
