@@ -5,12 +5,6 @@ clear java;
 % add JIDT path -> Gives warning error if ENTIRE filepath is not specified
 javaaddpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/infodynamics.jar')
 
-% add TRENTOOL path
-addpath('~/Documents/MATLAB/TRENTOOL3-master');
-
-% add Fieldtrip toolbox path
-addpath('~/Documents/MATLAB/fieldtrip-20160727');
-
 %% === START Variable System Parameters === %%
 % These 'variable' initial system parameters can be edited to change the outcome
 % of the simulation
