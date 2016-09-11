@@ -345,84 +345,6 @@ cell2csv('test.csv', c, ', ', 2013, '.');
 
 
 
-%% Plotter
-if plotGraph == true
-    % initialise array
-    timeAveragedData = zeros(num_sims, max_n/10);
-
-    % Sort flow & density for each simulation across multiple system sizes
-    % and store them in an array
-    for i = 1:system_size_counter
-        colNum = i*2;
-        timeAveragedData(1:num_sims, colNum-1:colNum) = sortrows([time_average_density_array(:, i) time_average_flow_array(:, i)], 1);
-    end
-    
-    figure
-    % subplot(3,1,2)
-    % scatter(time_average_density_array, time_average_flow_array, 'filled');
-    % title('Averaged Density vs Flow')
-    % xlabel('Time Averaged Density')
-    % ylabel('Time Averaged Flow')
-
-    subplot(3,2,1)
-    bar(num_cars_array_sorted);
-    title('Cars per simulation - Sorted (Ascending)')
-    xlabel('Number of simulations run')
-    ylabel('Number of cars')
-    xlim([0 num_sims])
-
-
-    
-
-    subplot(3,2,[3 6])
-    % Filter line
-    % windowSize = num_sims/5;
-    % yy = filter(ones(1,windowSize)/windowSize,1, timeAveragedData(:, 2));
-
-    y1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 2), 0.1, 'rlowess');
-    y2 = smooth(timeAveragedData(:, 3), timeAveragedData(:, 4), 0.1, 'rlowess');
-    y3 = smooth(timeAveragedData(:, 5), timeAveragedData(:, 6), 0.1, 'rlowess');
-    y4 = smooth(timeAveragedData(:, 7), timeAveragedData(:, 8), 0.1, 'rlowess');
-    y5 = smooth(timeAveragedData(:, 9), timeAveragedData(:, 10), 0.1, 'rlowess');
-    y6 = smooth(timeAveragedData(:, 11), timeAveragedData(:, 12), 0.1, 'rlowess');
-    y7 = smooth(timeAveragedData(:, 13), timeAveragedData(:, 14), 0.1, 'rlowess');
-    y8 = smooth(timeAveragedData(:, 15), timeAveragedData(:, 16), 0.1, 'rlowess');
-    y9 = smooth(timeAveragedData(:, 17), timeAveragedData(:, 18), 0.1, 'rlowess');
-    y10 = smooth(timeAveragedData(:, 19), timeAveragedData(:, 20), 0.1, 'rlowess');
-    
-    plot( ...
-        timeAveragedData(:, 1),y1,'y-', ...
-        timeAveragedData(:, 3),y2,'m-', ...
-        timeAveragedData(:, 5),y3,'c-', ...
-        timeAveragedData(:, 7),y4,'g-', ...
-        timeAveragedData(:, 9),y5,'r-',  ...
-        timeAveragedData(:, 11),y6,'y-', ...
-        timeAveragedData(:, 13),y7,'m-', ...
-        timeAveragedData(:, 15),y8,'c-', ...
-        timeAveragedData(:, 17),y9,'g-', ...
-        timeAveragedData(:, 19),y10,'r-' ...
-    );
-    % set(gca);
-    legend( ...
-        'y1', ...
-        'y2', ...
-        'y3', ...
-        'y4', ...
-        'y5', ...
-        'y6', ...
-        'y7', ...
-        'y8', ...
-        'y9', ...
-        'y10', ...
-        'Location','eastoutside' ...
-    );
-    title('Averaged Density vs Flow')
-    xlabel('Time Averaged Density')
-    ylabel('Time Averaged Flow')
-end
-
-
-
 %% Transfer Entropy Toolbox (JIDT)
 % % Generate some random binary data.
 % % Note that we need the *1 to make this a number not a Boolean,
@@ -733,3 +655,83 @@ if plotTE == true
     % save('TEmatrix.txt', 'a', '-ASCII');
     dlmwrite('TEmatrix.txt', caStates, 'delimiter', ' ', 'precision', 1);
 end
+
+
+
+
+%% Plotter
+if plotGraph == true
+    % initialise array
+    timeAveragedData = zeros(num_sims, max_n/10);
+
+    % Sort flow & density for each simulation across multiple system sizes
+    % and store them in an array
+    for i = 1:system_size_counter
+        colNum = i*2;
+        timeAveragedData(1:num_sims, colNum-1:colNum) = sortrows([time_average_density_array(:, i) time_average_flow_array(:, i)], 1);
+    end
+    
+    figure
+    % subplot(3,1,2)
+    % scatter(time_average_density_array, time_average_flow_array, 'filled');
+    % title('Averaged Density vs Flow')
+    % xlabel('Time Averaged Density')
+    % ylabel('Time Averaged Flow')
+
+    subplot(3,2,1)
+    bar(num_cars_array_sorted);
+    title('Cars per simulation - Sorted (Ascending)')
+    xlabel('Number of simulations run')
+    ylabel('Number of cars')
+    xlim([0 num_sims])
+
+
+    
+
+    subplot(3,2,[3 6])
+    % Filter line
+    % windowSize = num_sims/5;
+    % yy = filter(ones(1,windowSize)/windowSize,1, timeAveragedData(:, 2));
+
+    y1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 2), 0.1, 'rlowess');
+    y2 = smooth(timeAveragedData(:, 3), timeAveragedData(:, 4), 0.1, 'rlowess');
+    y3 = smooth(timeAveragedData(:, 5), timeAveragedData(:, 6), 0.1, 'rlowess');
+    y4 = smooth(timeAveragedData(:, 7), timeAveragedData(:, 8), 0.1, 'rlowess');
+    y5 = smooth(timeAveragedData(:, 9), timeAveragedData(:, 10), 0.1, 'rlowess');
+    y6 = smooth(timeAveragedData(:, 11), timeAveragedData(:, 12), 0.1, 'rlowess');
+    y7 = smooth(timeAveragedData(:, 13), timeAveragedData(:, 14), 0.1, 'rlowess');
+    y8 = smooth(timeAveragedData(:, 15), timeAveragedData(:, 16), 0.1, 'rlowess');
+    y9 = smooth(timeAveragedData(:, 17), timeAveragedData(:, 18), 0.1, 'rlowess');
+    y10 = smooth(timeAveragedData(:, 19), timeAveragedData(:, 20), 0.1, 'rlowess');
+    
+    plot( ...
+        timeAveragedData(:, 1),y1,'y-', ...
+        timeAveragedData(:, 3),y2,'m-', ...
+        timeAveragedData(:, 5),y3,'c-', ...
+        timeAveragedData(:, 7),y4,'g-', ...
+        timeAveragedData(:, 9),y5,'r-',  ...
+        timeAveragedData(:, 11),y6,'y-', ...
+        timeAveragedData(:, 13),y7,'m-', ...
+        timeAveragedData(:, 15),y8,'c-', ...
+        timeAveragedData(:, 17),y9,'g-', ...
+        timeAveragedData(:, 19),y10,'r-' ...
+    );
+    % set(gca);
+    legend( ...
+        'y1', ...
+        'y2', ...
+        'y3', ...
+        'y4', ...
+        'y5', ...
+        'y6', ...
+        'y7', ...
+        'y8', ...
+        'y9', ...
+        'y10', ...
+        'Location','eastoutside' ...
+    );
+    title('Averaged Density vs Flow')
+    xlabel('Time Averaged Density')
+    ylabel('Time Averaged Flow')
+end
+
