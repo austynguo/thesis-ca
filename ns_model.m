@@ -28,9 +28,6 @@ max_n = n;
 % Maximum Velocity
 v_max = 1;
 
-% Number of simulation rounds
-num_sims = 1;
-
 % Vehicle generation method
 % Options = 'random', 'naive', 'static'
 initialisation_method = 'random';
@@ -252,9 +249,9 @@ for h = 1:max_n/10:max_n
             end
         end
 
-    %% Print grid after t timesteps
-    fprintf('After %d timesteps (t = %d)\n', n, n);
-    disp(c);
+        %% Print grid after t timesteps
+    %     fprintf('After %d timesteps (t = %d)\n', n, n);
+    %     disp(c);
 
         %% Detect missing cars:
         num_cars_at_end = 0;
@@ -494,7 +491,7 @@ if plotTE == true
     % NStoTEMatrix.m arguments: NStoTEMatrix(cellgrid, timesteps, roadLength, max_velocity)
     caStates = NStoTEMatrix(c, n, m, v_max);
     %% Outputs caStates matrix for TE calculation
-    caStates
+    % caStates
 
 
     % convert the states to a format usable by java:
