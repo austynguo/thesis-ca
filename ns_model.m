@@ -641,8 +641,8 @@ for h = 1:max_n/10:max_n+1
 %             end
             
             %% Save ASCII text file of matrix
-            % save('TEmatrix.txt', 'a', '-ASCII');
-            dlmwrite('TEmatrix.txt', caStates, 'delimiter', ' ', 'precision', 1);
+            % Uncomment below line to generate text file
+            % dlmwrite('TEmatrix.txt', caStates, 'delimiter', ' ', 'precision', 1);
         end
     end
 end
