@@ -5,6 +5,10 @@ clear java;
 % add JIDT path -> Gives warning error if ENTIRE filepath is not specified
 javaaddpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/infodynamics.jar')
 
+% add paths to JIDT CA octave & matlab code
+addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave/CellularAutomata');
+addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave');
+
 %% === START Variable System Parameters === %%
 % These 'variable' initial system parameters can be edited to change the outcome
 % of the simulation
@@ -331,11 +335,6 @@ for h = 1:max_n/10:max_n+1
         %% Transfer Entropy Toolbox (JIDT)
         %% CA Simulation
         if calcTE == true
-            % add paths to JIDT CA octave & matlab code
-            addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave/CellularAutomata');
-            addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave');
-
-
             options.plotOptions.plotRows = n; % number of timesteps
             options.plotOptions.plotCols = m; % length of road
             options.plotOptions.plotStartRow = 1; % plot from row # onwards
