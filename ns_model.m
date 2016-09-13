@@ -21,7 +21,7 @@ verbose = false;
 n = 100; %number of time steps
 m = 50; %length of 'road'
 c = cell(n, m);
-max_n = n;
+max_m = m;
 
 % Maximum Velocity
 v_max = 1;
@@ -58,21 +58,22 @@ fnd_storage = zeros(num_sims, 3);
 
 % Pre-allocate array of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
-time_average_flow_array = zeros(num_sims, max_n/10);
-time_average_density_array = zeros(num_sims, max_n/10);
+time_average_flow_array = zeros(num_sims, max_m/10);
+time_average_density_array = zeros(num_sims, max_m/10);
 
 num_cars_array = zeros(num_sims, 1);
 missing_cars_array = zeros(num_sims, 1);
 
-smoothed_simulation_data = zeros(num_sims, max_n/10);
+smoothed_simulation_data = zeros(num_sims, max_m/10);
 
 system_size_counter = 0; % probs not needed
 
-average_TE_array = zeros(num_sims, max_n/10);
+average_TE_array = zeros(num_sims, max_m/10);
 
 %% START SIMULATION
-for h = 1:max_n/10:max_n+1
-    n = h; % set n (the road length) in each loop
+for h = 1:max_m/10:max_m+1
+    m = h; % set m (the road length) in each loop
+    fprintf('System size is %d, Time %s\n', m, datestr(now));
     system_size_counter = system_size_counter + 1; %increment one on each loop
     
     for k = 1:num_sims
@@ -654,7 +655,7 @@ end
 %% Plotter
 if plotGraph == true
     % initialise array
-    timeAveragedData = zeros(num_sims, 3*max_n/10);
+    timeAveragedData = zeros(num_sims, 3*max_m/10);
 
     % Sort flow & density for each simulation across multiple system sizes
     % and store them in an array
