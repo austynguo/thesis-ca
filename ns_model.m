@@ -772,6 +772,40 @@ legend( ...
     'Location','eastoutside' ...
 );
 
+title('Averaged Density vs TE')
+xlabel('Time Averaged Density')
+ylabel('Averaged TE')
+
+%% Plot single "Averaged Flow & TE relationship" graph
+figure
+
+% Dual y-axis plot
+yyaxis left
+plot( ...
+    timeAveragedData(:, 13), y5 ...
+);
+ylabel('Time Averaged Flow');
+
+yyaxis right
+plot( ...
+    timeAveragedData(:, 13), te5 ...
+);
+ylabel('Average Transfer Entropy');
+xlabel('Time Averaged Density');
+
+% Single y-axis plot
+% plot( ...
+%     timeAveragedData(:, 28),y10,'r-', ...
+%     timeAveragedData(:, 28), te10, 'b-' ...
+% );
+
+legend( ...
+    'y5', ...
+    'te5' ...
+);
+
+title('Averaged Flow & TE relationship');
+
 
 %% Export final cell array to csv format
 cell2csv('test.csv', c, ', ', 2013, '.');
