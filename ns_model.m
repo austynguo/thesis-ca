@@ -263,7 +263,7 @@ for h = 1:max_m/10:max_m+1
             end
         end
         missing_cars_array(k) = num_cars - num_cars_at_end;
-        fprintf('Missing cars: %d\n', num_cars - num_cars_at_end);
+        % fprintf('Missing cars: %d\n', num_cars - num_cars_at_end);
 
 
         %% Calc time averaged density
@@ -284,7 +284,7 @@ for h = 1:max_m/10:max_m+1
         end
 
         tad = tadsum/n; 
-        fprintf('Time Averaged Density: %.2f\n', tad);
+        % fprintf('Time Averaged Density: %.2f\n', tad);
 
         %% Calc time averaged flow
         % Need to figure this out better
@@ -321,7 +321,7 @@ for h = 1:max_m/10:max_m+1
 
         % WHAT HAPPENS IF TIME AVE FLOW IS ZERO??? (need catching case)
         taf = tafsum/n;
-        fprintf('Time Averaged Flow: %.2f\n', taf);
+        % fprintf('Time Averaged Flow: %.2f\n', taf);
 
         % Save averages to an array
         time_average_density_array(k, system_size_counter) = tad;
@@ -434,7 +434,7 @@ for h = 1:max_m/10:max_m+1
                 transferCalc.initialise();
                 transferCalc.addObservations(caStatesJInts, measureParams.j);
                 avTransfer = transferCalc.computeAverageLocalOfObservations();
-                fprintf('Average apparent transfer entropy (j=%d) = %.4f\n', measureParams.j, avTransfer);
+                % fprintf('Average apparent transfer entropy (j=%d) = %.4f\n', measureParams.j, avTransfer);
 
                 % Store average apparent TE
                 average_TE_array(k, system_size_counter) = avTransfer;
