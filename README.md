@@ -26,11 +26,13 @@ Steps:
 1. Clone/download the `master` branch to a new folder of your choosing
 2. Visit the JIDT [here](https://github.com/jlizier/jidt) and clone/download the `master` branch as well.
 3. Your folder structure should look like this:
+
   ```
   ├── YourNewFolder
       ├── thesis-ca
       └── infodynamics-dist-1.3
   ```
+	
 4. You should be ready to rumbleeeee!
 
 ## Running the code
