@@ -164,12 +164,7 @@ for h = 1:max_m/10:max_m+1
                     if verbose fprintf('Position: %d\n', i); end
 
                     %%% CALCULATE GAP %%%
-                    % pseudocode:
-                    % if next cell is a ' ' (space)
-                    %   gap =  recursegap()
-                    %     then increment gap variable by 1
-                    % else return 1
-                    % Calculate gap to next vehicle thru recursive function
+                    % Calculate gap to next vehicle via recursive function
                     gap = recursegap(c, row_counter, i, m);
                     if verbose fprintf('Row: %d Gap: %d\n', row_counter, gap); end
 
