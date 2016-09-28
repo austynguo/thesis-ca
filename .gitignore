@@ -1,0 +1,6 @@
+# ignore generated csv files
+*.csv
+*.pdf
+*.png
+*.fig
+*.mat
