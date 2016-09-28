@@ -1,4 +1,9 @@
 %% Calculate vehicle gap recursively
+% pseudocode:
+% if next cell is a ' ' (space)
+%   gap = recursegap()
+%     then increment gap variable by 1
+% else return 1
 function gap = recursegap(cellgrid, row, position, arraylength)
     % Grid is a toroid (essentially a loop connected from finish to start)
     % Take modulo of position variable and the array length
