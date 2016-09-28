@@ -6,7 +6,7 @@ clear java;
 javaaddpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/infodynamics.jar')
 
 % add paths to JIDT CA octave & matlab code
-addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave/CellularAutomata');
+% addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave/CellularAutomata');
 addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave');
 
 %% === START Variable System Parameters === %%
@@ -17,14 +17,15 @@ addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave');
 verbose = false;
 
 %% INITIALISATION
-% Initialise size n by m grid of cells
+% Initialise cell grid of size n by m
 n = 100; %number of time steps
-m = 50; %length of 'road'
+m = 100; %length of 'road'
 c = cell(n, m);
 max_m = m;
 
-% Maximum Velocity
-v_max = 1;
+% Maximum Velocity:
+% the max number of cells a vehicle can move per time step
+v_max = 5;
 
 % Vehicle generation method
 % Options = 'random', 'naive', 'static'
@@ -35,10 +36,10 @@ initialisation_method = 'random';
 simulationMode = 'single';
 
 % Number of simulation rounds
-num_sims = 1;
+num_sims = 10000;
 
 %% Plot graph of multiple simulations
-plotGraph = false;
+plotGraph = true;
 
 %% Calculate or Plot Transfer Entropy (single simulation only)
 calcTE = true;
@@ -107,15 +108,8 @@ for h = 1:max_m/10:max_m+1
                 if num_cars >= max_num_cars
                     break;
                 end
-                %% Commented out code seems to fix the random car generation
-                %% i.e. Random num of cars chosen for each simulation is now evenly distributed
-    %             if generation_gap ~= 0
-    %                 generation_gap = generation_gap - 1;
-    %                 continue
-    %             end
                 % generate vehicle with random speed rounded to nearest int
                 speed = round(v_max * rand, 0);
-    %             generation_gap = speed;
                 c{1, j} = speed;
                 num_cars = num_cars + 1;
             end
@@ -128,13 +122,8 @@ for h = 1:max_m/10:max_m+1
                 if num_cars >= naive_num_cars
                     break;
                 end
-                if generation_gap ~= 0
-                    generation_gap = generation_gap - 1;
-                    continue
-                end
                 % generate vehicle with random speed rounded to nearest int
                 speed = round(v_max * rand, 0);
-                generation_gap = speed;
                 c{1, j} = speed;
                 num_cars = num_cars + 1;
             end
@@ -177,12 +166,6 @@ for h = 1:max_m/10:max_m+1
                         % testing ending if statement so each step is independent
                     end
 
-
-                    %%% What time dependent data can be encoded?
-                    %%% recode acceleration as binary or trinary interaction??
-
-
-
                     %%% 2. SLOWING DOWN (Due to other cars) %%%
                     % If a vehicle at site i sees the next vehicle at
                     % site i + j (with j =< v), it reduces its speed to
@@ -209,12 +192,9 @@ for h = 1:max_m/10:max_m+1
                             velocity = min(velocity - 1, gap);
                         end
                         if verbose fprintf('new_velocity: %d\n', velocity); end
-
-                    %%% 3. RANDOMISATION %%%
-
-                    %% CHECK THAT THIS SECTION IS ACTUALLY REACHED!
                     end
-    %                 elseif velocity > 0
+                    
+                    %%% 3. RANDOMISATION %%%
                     %% Make randomisation step independent from accel/deceleration
                     % i.e. it can accelerate and brake immediately
                     if velocity > 0 && velocity > 0
@@ -236,7 +216,6 @@ for h = 1:max_m/10:max_m+1
                     end
                     %[TODO: Write catch case so cars don't drive on top of each other???]
                     % Probably not needed if random seeding is fixed
-                    % loljks still need to write this
 
                     if verbose fprintf('new velocity = %d\n', velocity); end
 
@@ -329,7 +308,7 @@ for h = 1:max_m/10:max_m+1
         tadsum = 0;
         
         %% Transfer Entropy Toolbox (JIDT)
-        %% CA Simulation
+        %% Functions for calculating & plotting TE based on JIDT by Joseph Lizier
         if calcTE == true
             options.plotOptions.plotRows = n; % number of timesteps
             options.plotOptions.plotCols = m; % length of road
@@ -366,7 +345,6 @@ for h = 1:max_m/10:max_m+1
             end
             figNum = 2;
 
-            %%====== Create here ======%%
             %% Convert NS model data to feed into here
             % Call function that converts the cell data from the above NS model
             % simulation into a matrix
@@ -669,6 +647,8 @@ if plotGraph == true
     % sort number of cars for easy graph reading
     num_cars_array_sorted = sort(num_cars_array);
 
+    % == Plotting cars per 'simulation round' is now rather pointless given
+    % that there are 10 rounds and we only output the graph of one
     subplot(3,2,1)
     bar(num_cars_array_sorted);
     title('Cars per simulation - Sorted (Ascending)')
