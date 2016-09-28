@@ -22,6 +22,7 @@ The aim of this project is to ascertain whether the infomration theoretic applic
 This project is written in MATLAB and is intended for use in tandem with the JIDT (Written by Joseph Lizier).
 
 Steps:
+
 1. Clone/download the `master` branch to a new folder of your choosing
 2. Visit the JIDT [here](https://github.com/jlizier/jidt) and clone/download the `master` branch as well.
 3. Your folder structure should look like this:
