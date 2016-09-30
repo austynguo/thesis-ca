@@ -37,7 +37,9 @@ Steps:
 
 ## Running the code
 1. Open `ns_model.m` in MATLAB
-2. Edit the lines containing the folder paths to the JIDT files - Lines 6 and 10. These should be replaced with the full folder path that you have set on your system. 
+2. Edit the lines containing the folder paths to the JIDT files - Lines 6 and 10. These should be replaced with the full folder path that you have set on your system.
+	- \*nix systems: e.g. `home/<username>/Documents/<parentfolder>/infodynamics-dist-1.3/infodynamics.jar`
+	- Windows: e.g. `C:\Users\<username>\Documents\<parentfolder>\infodynamics-dist-1.3\infodynamics.jar`
 3. View and edit any `Variable System Parameters` if required (see below section)
 4. Press F5 or click run to start the simulation.
 
