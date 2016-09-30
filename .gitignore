@@ -4,3 +4,6 @@
 *.png
 *.fig
 *.mat
+*node_modules/*
+*.html
+*.ico
