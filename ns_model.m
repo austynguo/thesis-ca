@@ -72,7 +72,8 @@ system_size_counter = 0; % probs not needed
 average_TE_array = zeros(num_sims, max_m/10);
 
 %% START SIMULATION
-for h = 1:max_m/10:max_m+1
+fprintf('Simulation started, Time %s\n', datestr(now));
+for h = max_m/10:max_m/10:max_m
     m = h; % set m (the road length) in each loop
     fprintf('System size is %d, Time %s\n', m, datestr(now));
     system_size_counter = system_size_counter + 1; %increment one on each loop
@@ -787,3 +788,4 @@ cell2csv('test.csv', c, ', ', 2013, '.');
 % cell2csv('tadseries.csv', tadseries, ', ', 2013, '.');
 % cell2csv('tafseries.csv', tafseries, ', ', 2013, '.');
 
+fprintf('Simulation finished, Time %s\n', datestr(now));
