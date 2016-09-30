@@ -32,12 +32,14 @@ Steps:
       ├── thesis-ca
       └── infodynamics-dist-1.3
   ```
-	
+
 4. You should be ready to rumbleeeee!
 
 ## Running the code
 1. Open `ns_model.m` in MATLAB
-2. View and edit any `Variable System Parameters` if required (see below section)
+2. Edit the lines containing the folder paths to the JIDT files - Lines 6 and 10. These should be replaced with the full folder path that you have set on your system. 
+3. View and edit any `Variable System Parameters` if required (see below section)
+4. Press F5 or click run to start the simulation.
 
 ## System Variables
 These variables control the parameters of the simulation such as:
