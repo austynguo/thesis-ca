@@ -318,7 +318,9 @@ for h = max_m/10:max_m/10:max_m
             options.plotOptions.plotStartCol = 1; % plot from column # onwards
 
             base = v_max + 2; % This allows for the multiple states
-            measureId = 'transfer';
+%             measureId = 'active';
+%             measureId = 'transfer';
+            measureId = 'mutual';
             measureParams.k = 1; % History length of 16 for info dynamics measures
 
             %not sure if measureParams.j is right??
@@ -361,7 +363,62 @@ for h = max_m/10:max_m/10:max_m
 
 
             plottedOne = false;
+            
+            
+            %============================
+            % Mutual Information
+            % Adapted from JIDt Cellular Automata Demos to calculate Mutual
+            % Information
+            if ((ischar(measureId) && (strcmpi('mutual', measureId) || strcmpi('all', measureId) || strcmpi('mutualinfo', measureId))) || ...
+                (not(ischar(measureId)) && ((measureId == 1) || (measureId == -1))))
+                % Compute apparent transfer entropy
+                if (measureParams.j == 0)
+                    error('Cannot compute mutual info from a cell to itself (setting measureParams.j == 0)');
+                end
+                mutualInfoCalc = javaObject('infodynamics.measures.discrete.MutualInformationCalculatorDiscrete', base, measureParams.k);
+                %^ this section takes slightly diff args to TE equivalent
+                
+                mutualInfoCalc.initialise();
+%                 mutualInfoCalc.addObservations(caStatesJInts, measureParams.j);
+%                 mutualInfoCalc.addObservations(caStatesJInts, 1, 2);
+                for i = 0:(h-2)
+%                     fprintf('%d\n', i);
+                    mutualInfoCalc.addObservations(caStatesJInts, i, i+1);
+                end
+                %^ .addObservations within
+                % 'MutualInformationCalculatorDiscrete' doesn't work in a
+                % similar way to 'TransferEntropyCalculatorDiscrete'
+                
+                avMutualInfo = mutualInfoCalc.computeAverageLocalOfObservations();
+                % fprintf('Average apparent transfer entropy (j=%d) = %.4f\n', measureParams.j, avMutualInfo);
 
+                % Store average apparent TE
+                average_TE_array(k, system_size_counter) = avMutualInfo;
+
+                if plotTE == true
+                    javaLocalValues = mutualInfoCalc.computeLocalFromPreviousObservations(caStatesJInts, measureParams.j);
+                    localValues = javaMatrixToOctave(javaLocalValues);
+                    if (isfield(options, 'movingFrameSpeed'))
+                        % User has requested us to evaluate information dynamics with a moving frame of reference
+                        % (see Lizier and Mahoney paper).
+                        % Need to shift the computed info dynamics back (to compensate for earlier shift to CA states:
+                        localValues = accumulateShift(localValues, options.movingFrameSpeed);
+                    end
+
+                    figure(figNum)
+                    figNum = figNum + 1;
+                    plotLocalInfoValues(localValues, options.plotOptions);
+                    if (options.saveImages)
+                        set(gca, 'fontsize', fontSize);
+                        colorbar('fontsize', fontSize);
+                        print(sprintf('figures/%s-transfer-k%d-j%d.%s', ruleString, measureParams.k, measureParams.j, options.saveImagesFormat), sprintf('-d%s', printDriver));
+                    end
+                    plottedOne = true;
+                end
+            end
+
+            
+            
             % Make the local information dynamics measurement(s)
 
             %============================
