@@ -52,7 +52,7 @@ These variables control the parameters of the simulation such as:
 - `initialisation_method`: Chooses a method of initialising all the vehicles at the beginning of a simulation instance, `random` mode is recommended as the other methods have not/will not been updated for large scale simulation use.
 - `num_sims`: The number of simulations to be run (more simulations run, the better - 1,000+ recommended).
 	- Note that the number of simulations specified in `num_sims` is effectively multiplied by 10.
-	- This is as the main simulation runs 10 smaller simulations with system sizes starting at size `m/10` (`m` divided by 10) and increasing in increments of `m/10` until the system reachs size `m`.
+	- This is as the main simulation runs 10 smaller simulations with system sizes starting at size `m/10` (`m` divided by 10) and increasing in increments of `m/10` until the system reaches size `m`.
 - `plotGraph`: Plots three graphs:
 	- Averaged Flow vs Density (Multiple sized systems)
 	- Averaged TE vs Density (Multiple sized systems)
