@@ -75,7 +75,8 @@ average_TE_array = zeros(num_sims, max_m/10);
 fprintf('Simulation started, Time %s\n', datestr(now));
 for h = max_m/10:max_m/10:max_m
     m = h; % set m (the road length) in each loop
-    fprintf('System size is %d, Time %s\n', m, datestr(now));
+    fprintf('Sim round %d of %d\n', m/10, max_m/10);
+    fprintf('System size %d, Time %s\n', m, datestr(now));
     system_size_counter = system_size_counter + 1; %increment one on each loop
     
     for k = 1:num_sims
@@ -627,6 +628,7 @@ end
 
 
 %% Plotter
+fprintf('Plotting started, Time %s\n', datestr(now));
 if plotGraph == true
     % initialise array
     timeAveragedData = zeros(num_sims, 3*max_m/10);
@@ -638,6 +640,21 @@ if plotGraph == true
         timeAveragedData(1:num_sims, colNum-2:colNum) = sortrows([time_average_density_array(:, i) time_average_flow_array(:, i) average_TE_array(:, i)], 1);
     end
     
+    %% Scatter graph of single
+    figure
+%     y = smooth(time_average_density_array(:,5), time_average_flow_array(:,5), 0.1, 'rlowess');
+%     plot(time_average_density_array(:,5),y,'r');
+
+    scatter(time_average_density_array(:,5), time_average_flow_array(:,5), 'filled');
+    hold on; % needs to be here or scatter plot wins race condition...
+    y = smooth(timeAveragedData(:, 13), timeAveragedData(:, 14), 0.1, 'rlowess');
+    plot(timeAveragedData(:, 13),y,'r');
+    
+    title('Averaged Density vs Flow')
+    xlabel('Time Averaged Density')
+    ylabel('Time Averaged Flow') 
+    
+    %% Smoothed Flow vs Density data (Multiple System Sizes)
     figure
     % subplot(3,1,2)
     % scatter(time_average_density_array, time_average_flow_array, 'filled');
@@ -650,17 +667,17 @@ if plotGraph == true
 
     % == Plotting cars per 'simulation round' is now rather pointless given
     % that there are 10 rounds and we only output the graph of one
-    subplot(3,2,1)
-    bar(num_cars_array_sorted);
-    title('Cars per simulation - Sorted (Ascending)')
-    xlabel('Number of simulations run')
-    ylabel('Number of cars')
-    xlim([0 num_sims])
-
-
-    
-
-    subplot(3,2,[3 6])
+%     subplot(3,2,1)
+%     bar(num_cars_array_sorted);
+%     title('Cars per simulation - Sorted (Ascending)')
+%     xlabel('Number of simulations run')
+%     ylabel('Number of cars')
+%     xlim([0 num_sims])
+% 
+% 
+%     
+% 
+%     subplot(3,2,[3 6])
     % Filter line
     % windowSize = num_sims/5;
     % yy = filter(ones(1,windowSize)/windowSize,1, timeAveragedData(:, 2));
@@ -707,7 +724,7 @@ if plotGraph == true
     ylabel('Time Averaged Flow')
 end
 
-%% Plot TE only
+%% Plot TE or MI only
 figure
 
 te1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 3), 0.1, 'rlowess');
@@ -734,7 +751,10 @@ plot( ...
     timeAveragedData(:, 28), te10, 'r--' ...
 );
 
-legend( ...
+
+
+if strcmpi('transfer', measureId)
+    legend( ...
     'te1', ...
     'te2', ...
     'te3', ...
@@ -746,11 +766,31 @@ legend( ...
     'te9', ...
     'te10', ...
     'Location','eastoutside' ...
-);
+    );
 
-title('Averaged Density vs TE')
-xlabel('Time Averaged Density')
-ylabel('Averaged TE')
+    title('Averaged Density vs TE')
+    xlabel('Time Averaged Density')
+    ylabel('Averaged TE')
+elseif strcmpi('mutual', measureId)
+    legend( ...
+    'mi1', ...
+    'mi2', ...
+    'mi3', ...
+    'mi4', ...
+    'mi5', ...
+    'mi6', ...
+    'mi7', ...
+    'mi8', ...
+    'mi9', ...
+    'mi10', ...
+    'Location','eastoutside' ...
+    );
+
+    title('Averaged Density vs MI')
+    xlabel('Time Averaged Density')
+    ylabel('Averaged MI')
+end
+
 
 %% Plot single "Averaged Flow & TE relationship" graph
 figure
@@ -766,7 +806,7 @@ yyaxis right
 plot( ...
     timeAveragedData(:, 13), te5 ...
 );
-ylabel('Average Transfer Entropy');
+% ylabel('Average Transfer Entropy');
 xlabel('Time Averaged Density');
 
 % Single y-axis plot
@@ -775,12 +815,33 @@ xlabel('Time Averaged Density');
 %     timeAveragedData(:, 28), te10, 'b-' ...
 % );
 
-legend( ...
-    'y5', ...
-    'te5' ...
-);
+if strcmpi('transfer', measureId)
+    ylabel('Average Transfer Entropy');
+    legend( ...
+        'y5', ...
+        'te5' ...
+    );
 
-title('Averaged Flow & TE relationship');
+    title('Averaged Flow & TE relationship');
+elseif strcmpi('mutual', measureId)
+    ylabel('Average Mutual Information');
+    legend( ...
+        'y5', ...
+        'mi5' ...
+    );
+
+    title('Averaged Flow & MI relationship');
+else
+    ylabel('Average ??');
+    legend( ...
+        'y5', ...
+        'line 5' ...
+    );
+
+    title('Averaged Flow & ?? relationship');
+end
+
+
 
 
 %% Export final cell array to csv format
@@ -788,4 +849,5 @@ cell2csv('test.csv', c, ', ', 2013, '.');
 % cell2csv('tadseries.csv', tadseries, ', ', 2013, '.');
 % cell2csv('tafseries.csv', tafseries, ', ', 2013, '.');
 
+fprintf('Plotting finished, Time %s\n', datestr(now));
 fprintf('Simulation finished, Time %s\n', datestr(now));
