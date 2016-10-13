@@ -707,6 +707,10 @@ if plotGraph == true
     hold on; % needs to be here or scatter plot wins race condition...
     y = smooth(timeAveragedData(:, 13), timeAveragedData(:, 14), 0.1, 'rlowess');
     plot(timeAveragedData(:, 13),y,'r');
+    legend( ...
+        'dots', ...
+        'y5' ...
+    );
     
     title('Averaged Density vs Flow')
     xlabel('Time Averaged Density')
@@ -782,7 +786,7 @@ if plotGraph == true
     ylabel('Time Averaged Flow')
 end
 
-%% Plot TE or MI only
+%% Plot Averaged Density vs TE or MI only
 figure
 
 te1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 3), 0.1, 'rlowess');
@@ -809,7 +813,7 @@ plot( ...
     timeAveragedData(:, 28), te10, 'r--' ...
 );
 
-
+axis([0 1 0 inf])
 
 if strcmpi('transfer', measureId)
     legend( ...
