@@ -239,8 +239,9 @@ for h = max_m/10:max_m/10:max_m
             end
         end
         missing_cars_array(k) = num_cars - num_cars_at_end;
-        % fprintf('Missing cars: %d\n', num_cars - num_cars_at_end);
-
+        if missing_cars_array(k) > 0
+            fprintf('Missing cars: %d\n', num_cars - num_cars_at_end);
+        end
 
         %% Calc time averaged density
         % only calcs for first column atm
