@@ -75,7 +75,7 @@ average_TE_array = zeros(num_sims, max_m/10);
 fprintf('Simulation started, Time %s\n', datestr(now));
 for h = max_m/10:max_m/10:max_m
     m = h; % set m (the road length) in each loop
-    fprintf('Sim round %d of %d\n', m/10, max_m/10);
+    fprintf('Sim round %d of %d\n', m/10, 10);
     fprintf('System size %d, Time %s\n', m, datestr(now));
     system_size_counter = system_size_counter + 1; %increment one on each loop
     
