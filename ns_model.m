@@ -18,8 +18,8 @@ verbose = false;
 
 %% INITIALISATION
 % Initialise cell grid of size n by m
-timesteps = 100; %number of time steps
-roadlength = 50; %length of 'road'
+timesteps = 500; %number of time steps
+roadlength = 500; %length of 'road'
 c = cell(timesteps, roadlength);
 max_roadlength = roadlength;
 
@@ -55,15 +55,13 @@ row_counter = 1;
 % disp('Initial grid (t = 0)');
 % disp(c);
 
-% Pre-allocate array of size 'num_sims'
+% Pre-allocate arrays of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
 time_average_flow_array = zeros(num_sims, max_roadlength/10);
 time_average_density_array = zeros(num_sims, max_roadlength/10);
 
 num_cars_array = zeros(num_sims, 1);
 missing_cars_array = zeros(num_sims, 1);
-
-smoothed_simulation_data = zeros(num_sims, max_roadlength/10);
 
 system_size_counter = 0; % probs not needed
 
@@ -75,22 +73,17 @@ for h = max_roadlength/10:max_roadlength/10:max_roadlength
     roadlength = h; % set the current system road length in each loop
     fprintf('Sim round %d of 10\n', (roadlength*10)/max_roadlength);
     fprintf('System size %d, Time %s\n', roadlength, datestr(now));
-    system_size_counter = system_size_counter + 1; %increment one on each loop
+    system_size_counter = system_size_counter + 1; % increment on each loop
     
     for k = 1:num_sims
-        % Might be a better way to initialise/clean grid
-        % might only need to initialise first row and then dynamically add rows
-        % (dynamic allocation computationally expensive)
+        % Initialise/clean grid
         for i = 1:timesteps %down y
             for j = 1:roadlength %right x
                 c{i, j} = ' ';
             end
         end
 
-        % [TODO: Combine above and below for loops]
-
         %% Initialise vehicles (locations and speeds)
-        % Method of random vehicle seeding
         num_cars = 0;
 
         if strcmp(initialisation_method, 'random')
@@ -126,8 +119,8 @@ for h = max_roadlength/10:max_roadlength/10:max_roadlength
             end
         elseif strcmp(initialisation_method, 'static')
         %% Previous static method of seeding cars
-        % Good for replicating exact base/start conditions, not good for large
-        % sets
+        % Good for replicating exact base/start conditions, not good for 
+        % large sets
             num_cars = 3;
             c{1, 2} = 3;
             c{1, 6} = 1;
@@ -238,16 +231,17 @@ for h = max_roadlength/10:max_roadlength/10:max_roadlength
             fprintf('Missing cars: %d\n', num_cars - num_cars_at_end);
         end
 
+        %%% Calculating time averaged density and flow
         % Define + Reset counter variables on each loop
         tafsum = 0;
         tadsum = 0;
         
-        %% Calc time averaged density
-        % only calcs for first column atm
+        %% Calculate time averaged density
+        % Calculates density for column 1
 
         for i = 1:timesteps
             if verbose fprintf('c{%d, 1}: %d', i, c{i, 1}); end
-            % if cell is empty, add one to the total sum
+            % if cell is not empty (occupied), add one to the total sum
             if c{i, 1} ~= ' '
                 tadsum = tadsum + 1;
             end
@@ -258,14 +252,12 @@ for h = max_roadlength/10:max_roadlength/10:max_roadlength
         tad = tadsum/timesteps; 
         % fprintf('Time Averaged Density: %.2f\n', tad);
 
-        %% Calc time averaged flow
-        % Need to figure this out better
-        % calc for column 1 and 2
+        %% Calculate time averaged flow
+        % Calculates flow between column 1 and 2
 
-        % c{n time steps, m road length}
+        % cellgrid{time steps, road length}
         % for each row
         for i = 1:timesteps-1
-        %     print message out
             if verbose fprintf('c{%d, 1}: %d', i, c{i, 1}); end
         %     for each value up to max velocity
             for j = 1:v_max
@@ -273,11 +265,14 @@ for h = max_roadlength/10:max_roadlength/10:max_roadlength
                 % check each cell moving right up to v_max
                 % temp value equals cell under target cell minus j value
                 % Modulo to check for road wrap-around
+                % i.e in this case mod(1 - j, roadlength) where '1' is the
+                % first column
                 temp1 = mod(1 - j, roadlength);
+%                 fprintf('mod: %d, temp1: %d, roadlength: %d\n', (1-j), temp1, roadlength);
                 if temp1 == 0
                     temp1 = roadlength;
                 end
-                % if cell is empty and is greater than j (i.e. moving)
+                % if cell is not empty and is greater than j (i.e. moving)
                 if c{i+1, temp1} ~= ' ' && c{i+1, temp1} >= j %% TOD0: CHECK IF = SIGN should be here
                     tafsum = tafsum + 1;
                     if verbose fprintf('Flow at timestep %d: %d %f\n', i, c{i+1, temp1}, c{i+1, temp1}/timesteps); end
