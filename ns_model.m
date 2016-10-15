@@ -18,10 +18,11 @@ verbose = false;
 
 %% INITIALISATION
 % Initialise cell grid of size n by m
-n = 100; %number of time steps
-m = 100; %length of 'road'
-c = cell(n, m);
-max_m = m;
+timesteps = 100; %number of time steps
+roadlength = 50; %length of 'road'
+c = cell(timesteps, roadlength);
+max_roadlength = roadlength;
+
 
 % Maximum Velocity:
 % the max number of cells a vehicle can move per time step
@@ -36,7 +37,7 @@ initialisation_method = 'random';
 simulationMode = 'single';
 
 % Number of simulation rounds
-num_sims = 10000;
+num_sims = 1000;
 
 %% Plot graph of multiple simulations
 plotGraph = true;
@@ -54,43 +55,37 @@ row_counter = 1;
 % disp('Initial grid (t = 0)');
 % disp(c);
 
-% Flow & Density Value storage
-fnd_storage = zeros(num_sims, 3);
-
 % Pre-allocate array of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
-time_average_flow_array = zeros(num_sims, max_m/10);
-time_average_density_array = zeros(num_sims, max_m/10);
+time_average_flow_array = zeros(num_sims, max_roadlength/10);
+time_average_density_array = zeros(num_sims, max_roadlength/10);
 
 num_cars_array = zeros(num_sims, 1);
 missing_cars_array = zeros(num_sims, 1);
 
-smoothed_simulation_data = zeros(num_sims, max_m/10);
+smoothed_simulation_data = zeros(num_sims, max_roadlength/10);
 
 system_size_counter = 0; % probs not needed
 
-average_TE_array = zeros(num_sims, max_m/10);
+average_TE_array = zeros(num_sims, max_roadlength/10);
 
 %% START SIMULATION
 fprintf('Simulation started, Time %s\n', datestr(now));
-for h = max_m/10:max_m/10:max_m
-    m = h; % set m (the road length) in each loop
-    fprintf('Sim round %d of 10\n', (m*10)/max_m);
-    fprintf('System size %d, Time %s\n', m, datestr(now));
+for h = max_roadlength/10:max_roadlength/10:max_roadlength
+    roadlength = h; % set the current system road length in each loop
+    fprintf('Sim round %d of 10\n', (roadlength*10)/max_roadlength);
+    fprintf('System size %d, Time %s\n', roadlength, datestr(now));
     system_size_counter = system_size_counter + 1; %increment one on each loop
     
     for k = 1:num_sims
         % Might be a better way to initialise/clean grid
         % might only need to initialise first row and then dynamically add rows
         % (dynamic allocation computationally expensive)
-        for i = 1:n %down y
-            fnd_storage(i, 1) = i;
-            for j = 1:m %right x
+        for i = 1:timesteps %down y
+            for j = 1:roadlength %right x
                 c{i, j} = ' ';
             end
         end
-
-        generation_gap = 0;
 
         % [TODO: Combine above and below for loops]
 
@@ -103,9 +98,9 @@ for h = max_m/10:max_m/10:max_m
             % Randomly generate a capped value for number of cars for this round
             % only. The aim is to ensure an even spread of simulations for a wide
             % range of vehicle numbers.
-            max_num_cars = round(rand * m);
+            max_num_cars = round(rand * roadlength);
 
-            for j = 1:m
+            for j = 1:roadlength
                 % Check each step that we do not exceed our predetermined value
                 if num_cars >= max_num_cars
                     break;
@@ -119,7 +114,7 @@ for h = max_m/10:max_m/10:max_m
             %% Naive vehicle initialisation
             naive_num_cars = 10; % set number of cars to be created using this naive method
 
-            for j = 1:m
+            for j = 1:roadlength
                 % Check each step that we do not exceed our predetermined value
                 if num_cars >= naive_num_cars
                     break;
@@ -141,9 +136,9 @@ for h = max_m/10:max_m/10:max_m
 
         num_cars_array(k) = num_cars;
 
-        for j = 1:n-1
+        for j = 1:timesteps-1
             row_counter = j;
-            for i = 1:m
+            for i = 1:roadlength
                 if (c{row_counter, i} >= 0 && c{row_counter, i} ~= ' ')
                     % Get current velocity
                     velocity = c{row_counter, i};
@@ -156,7 +151,7 @@ for h = max_m/10:max_m/10:max_m
 
                     %%% CALCULATE GAP %%%
                     % Calculate gap to next vehicle via recursive function
-                    gap = recursegap(c, row_counter, i, m);
+                    gap = recursegap(c, row_counter, i, roadlength);
                     if verbose fprintf('Row: %d Gap: %d\n', row_counter, gap); end
 
                     %%% 1. ACCELERATION %%%
@@ -212,9 +207,9 @@ for h = max_m/10:max_m/10:max_m
                     %%% CAR MOTION %%%
                     % Check modulo and if road has wrapped properly (road is of
                     % length 'm')
-                    newPosition = mod(i + velocity, m);
+                    newPosition = mod(i + velocity, roadlength);
                     if newPosition == 0
-                        newPosition = m;
+                        newPosition = roadlength;
                     end
                     %[TODO: Write catch case so cars don't drive on top of each other???]
                     % Probably not needed if random seeding is fixed
@@ -233,8 +228,8 @@ for h = max_m/10:max_m/10:max_m
 
         %% Detect missing cars:
         num_cars_at_end = 0;
-        for j = 1:m %right x
-            if c{n, j} ~= ' '
+        for j = 1:roadlength %right x
+            if c{timesteps, j} ~= ' '
                 num_cars_at_end = num_cars_at_end + 1;
             end
         end
@@ -243,35 +238,35 @@ for h = max_m/10:max_m/10:max_m
             fprintf('Missing cars: %d\n', num_cars - num_cars_at_end);
         end
 
+        % Define + Reset counter variables on each loop
+        taf = 0;
+        tafsum = 0;
+        tad = 0;
+        tadsum = 0;
+        
         %% Calc time averaged density
         % only calcs for first column atm
-        tadsum = 0;
 
-        for i = 1:n
+        for i = 1:timesteps
             if verbose fprintf('c{%d, 1}: %d', i, c{i, 1}); end
             % if cell is empty, add one to the total sum
             if c{i, 1} ~= ' '
                 tadsum = tadsum + 1;
-
-                %% Experimental data
-                fnd_storage(i, 2) = 1;
             end
 
             if verbose disp(tadsum); end
         end
 
-        tad = tadsum/n; 
+        tad = tadsum/timesteps; 
         % fprintf('Time Averaged Density: %.2f\n', tad);
 
         %% Calc time averaged flow
         % Need to figure this out better
         % calc for column 1 and 2
 
-        tafsum = 0;
-
         % c{n time steps, m road length}
         % for each row
-        for i = 1:n-1
+        for i = 1:timesteps-1
         %     print message out
             if verbose fprintf('c{%d, 1}: %d', i, c{i, 1}); end
         %     for each value up to max velocity
@@ -280,48 +275,40 @@ for h = max_m/10:max_m/10:max_m
                 % check each cell moving right up to v_max
                 % temp value equals cell under target cell minus j value
                 % Modulo to check for road wrap-around
-                temp1 = mod(1 - j, m);
+                temp1 = mod(1 - j, roadlength);
                 if temp1 == 0
-                    temp1 = m;
+                    temp1 = roadlength;
                 end
                 % if cell is empty and is greater than j (i.e. moving)
                 if c{i+1, temp1} ~= ' ' && c{i+1, temp1} >= j %% TOD0: CHECK IF = SIGN should be here
                     tafsum = tafsum + 1;
-                    if verbose fprintf('Flow at timestep %d: %d %f\n', i, c{i+1, temp1}, c{i+1, temp1}/n); end
-
-                    %% Experimental data
-                    fnd_storage(i, 3) = c{i+1, temp1};
+                    if verbose fprintf('Flow at timestep %d: %d %f\n', i, c{i+1, temp1}, c{i+1, temp1}/timesteps); end
                 end
             end
             if verbose fprintf('Time Averaged Flow cumulative sum: ', tafsum); end
         end
 
         % WHAT HAPPENS IF TIME AVE FLOW IS ZERO??? (need catching case)
-        taf = tafsum/n;
+        taf = tafsum/timesteps;
         % fprintf('Time Averaged Flow: %.2f\n', taf);
 
         % Save averages to an array
         time_average_density_array(k, system_size_counter) = tad;
         time_average_flow_array(k, system_size_counter) = taf; 
 
-        % Reset counter variables
-        taf = 0;
-        tafsum = 0;
-        tad = 0;
-        tadsum = 0;
         
         %% Transfer Entropy Toolbox (JIDT)
         %% Functions for calculating & plotting TE based on JIDT by Joseph Lizier
         if calcTE == true
-            options.plotOptions.plotRows = n; % number of timesteps
-            options.plotOptions.plotCols = m; % length of road
+            options.plotOptions.plotRows = timesteps; % number of timesteps
+            options.plotOptions.plotCols = roadlength; % length of road
             options.plotOptions.plotStartRow = 1; % plot from row # onwards
             options.plotOptions.plotStartCol = 1; % plot from column # onwards
 
             base = v_max + 2; % This allows for the multiple states
 %             measureId = 'active';
-%             measureId = 'transfer';
-            measureId = 'mutual';
+            measureId = 'transfer';
+%             measureId = 'mutual';
             measureParams.k = 1; % History length of 16 for info dynamics measures
 
             %not sure if measureParams.j is right??
@@ -354,7 +341,7 @@ for h = max_m/10:max_m/10:max_m
             % Call function that converts the cell data from the above NS model
             % simulation into a matrix
             % NStoTEMatrix.m arguments: NStoTEMatrix(cellgrid, timesteps, roadLength, max_velocity)
-            caStates = NStoTEMatrix(c, n, m, v_max);
+            caStates = NStoTEMatrix(c, timesteps, roadlength, v_max);
             %% Outputs caStates matrix for TE calculation
             % caStates
 
@@ -689,7 +676,7 @@ end
 fprintf('Plotting started, Time %s\n', datestr(now));
 if plotGraph == true
     % initialise array
-    timeAveragedData = zeros(num_sims, 3*max_m/10);
+    timeAveragedData = zeros(num_sims, 3*max_roadlength/10);
 
     % Sort flow & density for each simulation across multiple system sizes
     % and store them in an array
