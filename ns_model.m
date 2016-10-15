@@ -239,9 +239,7 @@ for h = max_roadlength/10:max_roadlength/10:max_roadlength
         end
 
         % Define + Reset counter variables on each loop
-        taf = 0;
         tafsum = 0;
-        tad = 0;
         tadsum = 0;
         
         %% Calc time averaged density
