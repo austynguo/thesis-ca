@@ -18,8 +18,8 @@ verbose = false;
 
 %% INITIALISATION
 % Initialise cell grid of size n by m
-timesteps = 500; %number of time steps
-roadlength = 500; %length of 'road'
+timesteps = 200; %number of time steps
+roadlength = 50; %length of 'road'
 c = cell(timesteps, roadlength);
 max_roadlength = roadlength;
 
@@ -37,7 +37,7 @@ initialisation_method = 'random';
 simulationMode = 'single';
 
 % Number of simulation rounds
-num_sims = 1000;
+num_sims = 10000;
 
 %% Plot graph of multiple simulations
 plotGraph = true;
@@ -66,6 +66,48 @@ missing_cars_array = zeros(num_sims, 1);
 system_size_counter = 0; % probs not needed
 
 average_TE_array = zeros(num_sims, max_roadlength/10);
+average_MI_array = zeros(num_sims, max_roadlength/10);
+
+
+%% TE and MI calculation and plotting variables
+options.plotOptions.plotRows = timesteps; % number of timesteps
+options.plotOptions.plotCols = roadlength; % length of road
+options.plotOptions.plotStartRow = 1; % plot from row # onwards
+options.plotOptions.plotStartCol = 1; % plot from column # onwards
+
+base = v_max + 2; % This allows for the multiple states
+%             measureId = 'active';
+%             measureId = 'transfer';
+%             measureId = 'mutual';
+measureId = 'transferAndMutual';
+
+measureParams.k = 1; % History length of 16 for info dynamics measures
+
+%not sure if measureParams.j is right??
+measureParams.j = 1;
+
+if not(isfield(options, 'plotOptions'))
+    options.plotOptions = {}; % Create it ready for plotRawCa etc
+end
+if not(isfield(options, 'saveImages'))
+    options.saveImages = false;
+end
+if not(isfield(options, 'saveImagesFormat'))
+    options.saveImagesFormat = 'eps';
+end
+if not(isfield(options, 'plotRawCa'))
+    options.plotRawCa = true;
+end
+
+if (strcmp(options.saveImagesFormat, 'eps'))
+    printDriver = 'epsc'; % to force colour
+    fontSize = 32;
+else
+    printDriver = options.saveImagesFormat;
+    fontSize = 13;
+end
+figNum = 2;
+
 
 %% START SIMULATION
 fprintf('Simulation started, Time %s\n', datestr(now));
@@ -293,42 +335,7 @@ for h = max_roadlength/10:max_roadlength/10:max_roadlength
         %% Transfer Entropy Toolbox (JIDT)
         %% Functions for calculating & plotting TE based on JIDT by Joseph Lizier
         if calcTE == true
-            options.plotOptions.plotRows = timesteps; % number of timesteps
-            options.plotOptions.plotCols = roadlength; % length of road
-            options.plotOptions.plotStartRow = 1; % plot from row # onwards
-            options.plotOptions.plotStartCol = 1; % plot from column # onwards
 
-            base = v_max + 2; % This allows for the multiple states
-%             measureId = 'active';
-            measureId = 'transfer';
-%             measureId = 'mutual';
-            measureParams.k = 1; % History length of 16 for info dynamics measures
-
-            %not sure if measureParams.j is right??
-            measureParams.j = 1;
-
-            if not(isfield(options, 'plotOptions'))
-                options.plotOptions = {}; % Create it ready for plotRawCa etc
-            end
-            if not(isfield(options, 'saveImages'))
-                options.saveImages = false;
-            end
-            if not(isfield(options, 'saveImagesFormat'))
-                options.saveImagesFormat = 'eps';
-            end
-            if not(isfield(options, 'plotRawCa'))
-                options.plotRawCa = true;
-            end
-
-
-            if (strcmp(options.saveImagesFormat, 'eps'))
-                printDriver = 'epsc'; % to force colour
-                fontSize = 32;
-            else
-                printDriver = options.saveImagesFormat;
-                fontSize = 13;
-            end
-            figNum = 2;
 
             %% Convert NS model data to feed into here
             % Call function that converts the cell data from the above NS model
@@ -350,7 +357,7 @@ for h = max_roadlength/10:max_roadlength/10:max_roadlength
             % Mutual Information
             % Adapted from JIDt Cellular Automata Demos to calculate Mutual
             % Information
-            if ((ischar(measureId) && (strcmpi('mutual', measureId) || strcmpi('all', measureId) || strcmpi('mutualinfo', measureId))) || ...
+            if ((ischar(measureId) && (strcmpi('mutual', measureId) || strcmpi('transferAndMutual', measureId) || strcmpi('all', measureId) || strcmpi('mutualinfo', measureId))) || ...
                 (not(ischar(measureId)) && ((measureId == 1) || (measureId == -1))))
                 % Compute apparent transfer entropy
                 if (measureParams.j == 0)
@@ -373,8 +380,8 @@ for h = max_roadlength/10:max_roadlength/10:max_roadlength
                 avMutualInfo = mutualInfoCalc.computeAverageLocalOfObservations();
                 % fprintf('Average apparent transfer entropy (j=%d) = %.4f\n', measureParams.j, avMutualInfo);
 
-                % Store average apparent TE
-                average_TE_array(k, system_size_counter) = avMutualInfo;
+                % Store average MI
+                average_MI_array(k, system_size_counter) = avMutualInfo;
 
                 if plotTE == true
                     javaLocalValues = mutualInfoCalc.computeLocalFromPreviousObservations(caStatesJInts, measureParams.j);
@@ -437,7 +444,7 @@ for h = max_roadlength/10:max_roadlength/10:max_roadlength
 
             %============================
             % Apparent transfer entropy
-            if ((ischar(measureId) && (strcmpi('transfer', measureId) || strcmpi('all', measureId) || strcmpi('apparenttransfer', measureId))) || ...
+            if ((ischar(measureId) && (strcmpi('transfer', measureId) || strcmpi('transferAndMutual', measureId) || strcmpi('all', measureId) || strcmpi('apparenttransfer', measureId))) || ...
                 (not(ischar(measureId)) && ((measureId == 1) || (measureId == -1))))
                 % Compute apparent transfer entropy
                 if (measureParams.j == 0)
@@ -669,13 +676,13 @@ end
 fprintf('Plotting started, Time %s\n', datestr(now));
 if plotGraph == true
     % initialise array
-    timeAveragedData = zeros(num_sims, 3*max_roadlength/10);
+    timeAveragedData = zeros(num_sims, 4*max_roadlength/10);
 
     % Sort flow & density for each simulation across multiple system sizes
     % and store them in an array
     for i = 1:system_size_counter
-        colNum = i*3;
-        timeAveragedData(1:num_sims, colNum-2:colNum) = sortrows([time_average_density_array(:, i) time_average_flow_array(:, i) average_TE_array(:, i)], 1);
+        colNum = i*4;
+        timeAveragedData(1:num_sims, colNum-3:colNum) = sortrows([time_average_density_array(:, i) time_average_flow_array(:, i) average_TE_array(:, i) average_MI_array(:, i)], 1);
     end
     
     %% Scatter graph of single
@@ -685,8 +692,8 @@ if plotGraph == true
 
     scatter(time_average_density_array(:,5), time_average_flow_array(:,5), 'filled');
     hold on; % needs to be here or scatter plot wins race condition...
-    y = smooth(timeAveragedData(:, 13), timeAveragedData(:, 14), 0.1, 'rlowess');
-    plot(timeAveragedData(:, 13),y,'r');
+    y = smooth(timeAveragedData(:, 17), timeAveragedData(:, 18), 0.1, 'rlowess');
+    plot(timeAveragedData(:, 17),y,'r');
     legend( ...
         'dots', ...
         'y5' ...
@@ -725,27 +732,27 @@ if plotGraph == true
     % yy = filter(ones(1,windowSize)/windowSize,1, timeAveragedData(:, 2));
 
     y1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 2), 0.1, 'rlowess');
-    y2 = smooth(timeAveragedData(:, 4), timeAveragedData(:, 5), 0.1, 'rlowess');
-    y3 = smooth(timeAveragedData(:, 7), timeAveragedData(:, 8), 0.1, 'rlowess');
-    y4 = smooth(timeAveragedData(:, 10), timeAveragedData(:, 11), 0.1, 'rlowess');
-    y5 = smooth(timeAveragedData(:, 13), timeAveragedData(:, 14), 0.1, 'rlowess');
-    y6 = smooth(timeAveragedData(:, 16), timeAveragedData(:, 17), 0.1, 'rlowess');
-    y7 = smooth(timeAveragedData(:, 19), timeAveragedData(:, 20), 0.1, 'rlowess');
-    y8 = smooth(timeAveragedData(:, 22), timeAveragedData(:, 23), 0.1, 'rlowess');
-    y9 = smooth(timeAveragedData(:, 25), timeAveragedData(:, 26), 0.1, 'rlowess');
-    y10 = smooth(timeAveragedData(:, 28), timeAveragedData(:, 29), 0.1, 'rlowess');
+    y2 = smooth(timeAveragedData(:, 5), timeAveragedData(:, 6), 0.1, 'rlowess');
+    y3 = smooth(timeAveragedData(:, 9), timeAveragedData(:, 10), 0.1, 'rlowess');
+    y4 = smooth(timeAveragedData(:, 13), timeAveragedData(:, 14), 0.1, 'rlowess');
+    y5 = smooth(timeAveragedData(:, 17), timeAveragedData(:, 18), 0.1, 'rlowess');
+    y6 = smooth(timeAveragedData(:, 21), timeAveragedData(:, 22), 0.1, 'rlowess');
+    y7 = smooth(timeAveragedData(:, 25), timeAveragedData(:, 26), 0.1, 'rlowess');
+    y8 = smooth(timeAveragedData(:, 29), timeAveragedData(:, 30), 0.1, 'rlowess');
+    y9 = smooth(timeAveragedData(:, 33), timeAveragedData(:, 34), 0.1, 'rlowess');
+    y10 = smooth(timeAveragedData(:, 37), timeAveragedData(:, 38), 0.1, 'rlowess');
     
     plot( ...
         timeAveragedData(:, 1),y1,'b-', ...
-        timeAveragedData(:, 4),y2,'m-', ...
-        timeAveragedData(:, 7),y3,'c-', ...
-        timeAveragedData(:, 10),y4,'g-', ...
-        timeAveragedData(:, 13),y5,'r-', ...
-        timeAveragedData(:, 16),y6,'b--', ...
-        timeAveragedData(:, 19),y7,'m--', ...
-        timeAveragedData(:, 22),y8,'c--', ...
-        timeAveragedData(:, 25),y9,'g--', ...
-        timeAveragedData(:, 28),y10,'r--' ...
+        timeAveragedData(:, 5),y2,'m-', ...
+        timeAveragedData(:, 9),y3,'c-', ...
+        timeAveragedData(:, 13),y4,'g-', ...
+        timeAveragedData(:, 17),y5,'r-', ...
+        timeAveragedData(:, 21),y6,'b--', ...
+        timeAveragedData(:, 25),y7,'m--', ...
+        timeAveragedData(:, 29),y8,'c--', ...
+        timeAveragedData(:, 33),y9,'g--', ...
+        timeAveragedData(:, 37),y10,'r--' ...
     );
     % set(gca);
     legend( ...
@@ -766,36 +773,36 @@ if plotGraph == true
     ylabel('Time Averaged Flow')
 end
 
-%% Plot Averaged Density vs TE or MI only
+%% Plot Averaged Density vs TE only
 figure
 
 te1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 3), 0.1, 'rlowess');
-te2 = smooth(timeAveragedData(:, 4), timeAveragedData(:, 6), 0.1, 'rlowess');
-te3 = smooth(timeAveragedData(:, 7), timeAveragedData(:, 9), 0.1, 'rlowess');
-te4 = smooth(timeAveragedData(:, 10), timeAveragedData(:,12 ), 0.1, 'rlowess');
-te5 = smooth(timeAveragedData(:, 13), timeAveragedData(:, 15), 0.1, 'rlowess');
-te6 = smooth(timeAveragedData(:, 16), timeAveragedData(:, 18), 0.1, 'rlowess');
-te7 = smooth(timeAveragedData(:, 19), timeAveragedData(:, 21), 0.1, 'rlowess');
-te8 = smooth(timeAveragedData(:, 22), timeAveragedData(:, 24), 0.1, 'rlowess');
-te9 = smooth(timeAveragedData(:, 25), timeAveragedData(:, 27), 0.1, 'rlowess');
-te10 = smooth(timeAveragedData(:, 28), timeAveragedData(:, 30), 0.1, 'rlowess');
+te2 = smooth(timeAveragedData(:, 5), timeAveragedData(:, 7), 0.1, 'rlowess');
+te3 = smooth(timeAveragedData(:, 9), timeAveragedData(:, 11), 0.1, 'rlowess');
+te4 = smooth(timeAveragedData(:, 13), timeAveragedData(:, 15), 0.1, 'rlowess');
+te5 = smooth(timeAveragedData(:, 17), timeAveragedData(:, 19), 0.1, 'rlowess');
+te6 = smooth(timeAveragedData(:, 21), timeAveragedData(:, 23), 0.1, 'rlowess');
+te7 = smooth(timeAveragedData(:, 25), timeAveragedData(:, 27), 0.1, 'rlowess');
+te8 = smooth(timeAveragedData(:, 29), timeAveragedData(:, 31), 0.1, 'rlowess');
+te9 = smooth(timeAveragedData(:, 33), timeAveragedData(:, 35), 0.1, 'rlowess');
+te10 = smooth(timeAveragedData(:, 37), timeAveragedData(:, 39), 0.1, 'rlowess');
 
 plot( ... 
     timeAveragedData(:, 1), te1, 'b-', ...
-    timeAveragedData(:, 4), te2, 'm-', ...
-    timeAveragedData(:, 7), te3, 'c-', ...
-    timeAveragedData(:, 10), te4, 'g-', ...
-    timeAveragedData(:, 13), te5, 'r-', ...
-    timeAveragedData(:, 16), te6, 'b--', ...
-    timeAveragedData(:, 19), te7, 'm--', ...
-    timeAveragedData(:, 22), te8, 'c--', ...
-    timeAveragedData(:, 25), te9, 'g--', ...
-    timeAveragedData(:, 28), te10, 'r--' ...
+    timeAveragedData(:, 5), te2, 'm-', ...
+    timeAveragedData(:, 9), te3, 'c-', ...
+    timeAveragedData(:, 13), te4, 'g-', ...
+    timeAveragedData(:, 17), te5, 'r-', ...
+    timeAveragedData(:, 21), te6, 'b--', ...
+    timeAveragedData(:, 25), te7, 'm--', ...
+    timeAveragedData(:, 29), te8, 'c--', ...
+    timeAveragedData(:, 33), te9, 'g--', ...
+    timeAveragedData(:, 37), te10, 'r--' ...
 );
 
 axis([0 1 0 inf])
 
-if strcmpi('transfer', measureId)
+if strcmpi('transfer', measureId) || strcmpi('transferAndMutual', measureId)
     legend( ...
     'te1', ...
     'te2', ...
@@ -813,7 +820,38 @@ if strcmpi('transfer', measureId)
     title('Averaged Density vs TE')
     xlabel('Time Averaged Density')
     ylabel('Averaged TE')
-elseif strcmpi('mutual', measureId)
+end
+
+%% Plot Averaged Density vs MI only
+figure
+
+mi1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 4), 0.1, 'rlowess');
+mi2 = smooth(timeAveragedData(:, 5), timeAveragedData(:, 8), 0.1, 'rlowess');
+mi3 = smooth(timeAveragedData(:, 9), timeAveragedData(:, 12), 0.1, 'rlowess');
+mi4 = smooth(timeAveragedData(:, 13), timeAveragedData(:,16), 0.1, 'rlowess');
+mi5 = smooth(timeAveragedData(:, 17), timeAveragedData(:, 20), 0.1, 'rlowess');
+mi6 = smooth(timeAveragedData(:, 21), timeAveragedData(:, 24), 0.1, 'rlowess');
+mi7 = smooth(timeAveragedData(:, 25), timeAveragedData(:, 28), 0.1, 'rlowess');
+mi8 = smooth(timeAveragedData(:, 29), timeAveragedData(:, 32), 0.1, 'rlowess');
+mi9 = smooth(timeAveragedData(:, 33), timeAveragedData(:, 36), 0.1, 'rlowess');
+mi10 = smooth(timeAveragedData(:, 37), timeAveragedData(:, 40), 0.1, 'rlowess');
+
+plot( ... 
+    timeAveragedData(:, 1), mi1, 'b-', ...
+    timeAveragedData(:, 5), mi2, 'm-', ...
+    timeAveragedData(:, 9), mi3, 'c-', ...
+    timeAveragedData(:, 13), mi4, 'g-', ...
+    timeAveragedData(:, 17), mi5, 'r-', ...
+    timeAveragedData(:, 21), mi6, 'b--', ...
+    timeAveragedData(:, 25), mi7, 'm--', ...
+    timeAveragedData(:, 29), mi8, 'c--', ...
+    timeAveragedData(:, 33), mi9, 'g--', ...
+    timeAveragedData(:, 37), mi10, 'r--' ...
+);
+
+axis([0 1 0 inf])
+
+if strcmpi('mutual', measureId) || strcmpi('transferAndMutual', measureId)
     legend( ...
     'mi1', ...
     'mi2', ...
@@ -833,20 +871,20 @@ elseif strcmpi('mutual', measureId)
     ylabel('Averaged MI')
 end
 
-
 %% Plot single "Averaged Flow & TE relationship" graph
 figure
 
 % Dual y-axis plot
 yyaxis left
 plot( ...
-    timeAveragedData(:, 13), y5 ...
+    timeAveragedData(:, 17), y5 ...
 );
 ylabel('Time Averaged Flow');
 
 yyaxis right
 plot( ...
-    timeAveragedData(:, 13), te5 ...
+    timeAveragedData(:, 17), te5, ...
+    timeAveragedData(:, 17), mi5 ...
 );
 % ylabel('Average Transfer Entropy');
 xlabel('Time Averaged Density');
@@ -874,13 +912,14 @@ elseif strcmpi('mutual', measureId)
 
     title('Averaged Flow & MI relationship');
 else
-    ylabel('Average ??');
+    ylabel('Average TE & MI');
     legend( ...
         'y5', ...
-        'line 5' ...
+        'transfer entropy 5', ...
+        'mutual information 5' ...
     );
 
-    title('Averaged Flow & ?? relationship');
+    title('Averaged Flow & TE/MI relationship');
 end
 
 
