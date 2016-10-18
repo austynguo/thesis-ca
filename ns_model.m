@@ -55,18 +55,20 @@ row_counter = 1;
 % disp('Initial grid (t = 0)');
 % disp(c);
 
+roadLengthTenth = max_roadlength/10;
+
 % Pre-allocate arrays of size 'num_sims'
 % Arrays store averaged values that will be analyzed later
-time_average_flow_array = zeros(num_sims, max_roadlength/10);
-time_average_density_array = zeros(num_sims, max_roadlength/10);
+time_average_flow_array = zeros(num_sims, roadLengthTenth);
+time_average_density_array = zeros(num_sims, roadLengthTenth);
 
 num_cars_array = zeros(num_sims, 1);
 missing_cars_array = zeros(num_sims, 1);
 
 system_size_counter = 0; % probs not needed
 
-average_TE_array = zeros(num_sims, max_roadlength/10);
-average_MI_array = zeros(num_sims, max_roadlength/10);
+average_TE_array = zeros(num_sims, roadLengthTenth);
+average_MI_array = zeros(num_sims, roadLengthTenth);
 
 
 %% TE and MI calculation and plotting variables
@@ -111,7 +113,7 @@ figNum = 2;
 
 %% START SIMULATION
 fprintf('Simulation started, Time %s\n', datestr(now));
-for h = max_roadlength/10:max_roadlength/10:max_roadlength
+for h = roadLengthTenth:roadLengthTenth:max_roadlength
     roadlength = h; % set the current system road length in each loop
     fprintf('Sim round %d of 10\n', (roadlength*10)/max_roadlength);
     fprintf('System size %d, Time %s\n', roadlength, datestr(now));
