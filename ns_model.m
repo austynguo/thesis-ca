@@ -238,7 +238,7 @@ for h = roadLengthTenth:roadLengthTenth:max_roadlength
                     %%% 3. RANDOMISATION %%%
                     %% Make randomisation step independent from accel/deceleration
                     % i.e. it can accelerate and brake immediately
-                    if velocity > 0 && velocity > 0
+                    if velocity > 0 && gap ~= 1
                         % if rand number less than p threshold, then reduce velocity
                         % probability p
                         p = 0.25;
