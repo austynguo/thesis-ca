@@ -165,10 +165,17 @@ for h = roadLengthTenth:roadLengthTenth:max_roadlength
         %% Previous static method of seeding cars
         % Good for replicating exact base/start conditions, not good for 
         % large sets
-            num_cars = 3;
+            num_cars = 10;
+            c{1, 1} = 3;
             c{1, 2} = 3;
+            c{1, 3} = 3;
+            c{1, 4} = 3;
+            c{1, 5} = 3;
             c{1, 6} = 1;
+            c{1, 7} = 3;
+            c{1, 8} = 3;
             c{1, 9} = 1;
+            c{1, 10} = 3;
         end
 
         num_cars_array(k) = num_cars;
