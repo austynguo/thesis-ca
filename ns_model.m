@@ -701,7 +701,7 @@ if plotGraph == true
 
     scatter(time_average_density_array(:,5), time_average_flow_array(:,5), 'filled');
     hold on; % needs to be here or scatter plot wins race condition...
-    y = smooth(timeAveragedData(:, 17), timeAveragedData(:, 18), 0.1, 'rlowess');
+    y = smooth(timeAveragedData(:, 17), timeAveragedData(:, 18), 0.1, 'lowess');
     plot(timeAveragedData(:, 17),y,'r');
     legend( ...
         'dots', ...
@@ -740,16 +740,16 @@ if plotGraph == true
     % windowSize = num_sims/5;
     % yy = filter(ones(1,windowSize)/windowSize,1, timeAveragedData(:, 2));
 
-    y1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 2), 0.1, 'rlowess');
-    y2 = smooth(timeAveragedData(:, 5), timeAveragedData(:, 6), 0.1, 'rlowess');
-    y3 = smooth(timeAveragedData(:, 9), timeAveragedData(:, 10), 0.1, 'rlowess');
-    y4 = smooth(timeAveragedData(:, 13), timeAveragedData(:, 14), 0.1, 'rlowess');
-    y5 = smooth(timeAveragedData(:, 17), timeAveragedData(:, 18), 0.1, 'rlowess');
-    y6 = smooth(timeAveragedData(:, 21), timeAveragedData(:, 22), 0.1, 'rlowess');
-    y7 = smooth(timeAveragedData(:, 25), timeAveragedData(:, 26), 0.1, 'rlowess');
-    y8 = smooth(timeAveragedData(:, 29), timeAveragedData(:, 30), 0.1, 'rlowess');
-    y9 = smooth(timeAveragedData(:, 33), timeAveragedData(:, 34), 0.1, 'rlowess');
-    y10 = smooth(timeAveragedData(:, 37), timeAveragedData(:, 38), 0.1, 'rlowess');
+    y1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 2), 0.1, 'lowess');
+    y2 = smooth(timeAveragedData(:, 5), timeAveragedData(:, 6), 0.1, 'lowess');
+    y3 = smooth(timeAveragedData(:, 9), timeAveragedData(:, 10), 0.1, 'lowess');
+    y4 = smooth(timeAveragedData(:, 13), timeAveragedData(:, 14), 0.1, 'lowess');
+    y5 = smooth(timeAveragedData(:, 17), timeAveragedData(:, 18), 0.1, 'lowess');
+    y6 = smooth(timeAveragedData(:, 21), timeAveragedData(:, 22), 0.1, 'lowess');
+    y7 = smooth(timeAveragedData(:, 25), timeAveragedData(:, 26), 0.1, 'lowess');
+    y8 = smooth(timeAveragedData(:, 29), timeAveragedData(:, 30), 0.1, 'lowess');
+    y9 = smooth(timeAveragedData(:, 33), timeAveragedData(:, 34), 0.1, 'lowess');
+    y10 = smooth(timeAveragedData(:, 37), timeAveragedData(:, 38), 0.1, 'lowess');
     
     plot( ...
         timeAveragedData(:, 1),y1,'b-', ...
@@ -784,16 +784,16 @@ if plotGraph == true
     %% Plot Averaged Density vs TE only
     figure
 
-    te1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 3), 0.1, 'rlowess');
-    te2 = smooth(timeAveragedData(:, 5), timeAveragedData(:, 7), 0.1, 'rlowess');
-    te3 = smooth(timeAveragedData(:, 9), timeAveragedData(:, 11), 0.1, 'rlowess');
-    te4 = smooth(timeAveragedData(:, 13), timeAveragedData(:, 15), 0.1, 'rlowess');
-    te5 = smooth(timeAveragedData(:, 17), timeAveragedData(:, 19), 0.1, 'rlowess');
-    te6 = smooth(timeAveragedData(:, 21), timeAveragedData(:, 23), 0.1, 'rlowess');
-    te7 = smooth(timeAveragedData(:, 25), timeAveragedData(:, 27), 0.1, 'rlowess');
-    te8 = smooth(timeAveragedData(:, 29), timeAveragedData(:, 31), 0.1, 'rlowess');
-    te9 = smooth(timeAveragedData(:, 33), timeAveragedData(:, 35), 0.1, 'rlowess');
-    te10 = smooth(timeAveragedData(:, 37), timeAveragedData(:, 39), 0.1, 'rlowess');
+    te1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 3), 0.1, 'lowess');
+    te2 = smooth(timeAveragedData(:, 5), timeAveragedData(:, 7), 0.1, 'lowess');
+    te3 = smooth(timeAveragedData(:, 9), timeAveragedData(:, 11), 0.1, 'lowess');
+    te4 = smooth(timeAveragedData(:, 13), timeAveragedData(:, 15), 0.1, 'lowess');
+    te5 = smooth(timeAveragedData(:, 17), timeAveragedData(:, 19), 0.1, 'lowess');
+    te6 = smooth(timeAveragedData(:, 21), timeAveragedData(:, 23), 0.1, 'lowess');
+    te7 = smooth(timeAveragedData(:, 25), timeAveragedData(:, 27), 0.1, 'lowess');
+    te8 = smooth(timeAveragedData(:, 29), timeAveragedData(:, 31), 0.1, 'lowess');
+    te9 = smooth(timeAveragedData(:, 33), timeAveragedData(:, 35), 0.1, 'lowess');
+    te10 = smooth(timeAveragedData(:, 37), timeAveragedData(:, 39), 0.1, 'lowess');
 
     plot( ... 
         timeAveragedData(:, 1), te1, 'b-', ...
@@ -833,16 +833,16 @@ if plotGraph == true
     %% Plot Averaged Density vs MI only
     figure
 
-    mi1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 4), 0.1, 'rlowess');
-    mi2 = smooth(timeAveragedData(:, 5), timeAveragedData(:, 8), 0.1, 'rlowess');
-    mi3 = smooth(timeAveragedData(:, 9), timeAveragedData(:, 12), 0.1, 'rlowess');
-    mi4 = smooth(timeAveragedData(:, 13), timeAveragedData(:,16), 0.1, 'rlowess');
-    mi5 = smooth(timeAveragedData(:, 17), timeAveragedData(:, 20), 0.1, 'rlowess');
-    mi6 = smooth(timeAveragedData(:, 21), timeAveragedData(:, 24), 0.1, 'rlowess');
-    mi7 = smooth(timeAveragedData(:, 25), timeAveragedData(:, 28), 0.1, 'rlowess');
-    mi8 = smooth(timeAveragedData(:, 29), timeAveragedData(:, 32), 0.1, 'rlowess');
-    mi9 = smooth(timeAveragedData(:, 33), timeAveragedData(:, 36), 0.1, 'rlowess');
-    mi10 = smooth(timeAveragedData(:, 37), timeAveragedData(:, 40), 0.1, 'rlowess');
+    mi1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 4), 0.1, 'lowess');
+    mi2 = smooth(timeAveragedData(:, 5), timeAveragedData(:, 8), 0.1, 'lowess');
+    mi3 = smooth(timeAveragedData(:, 9), timeAveragedData(:, 12), 0.1, 'lowess');
+    mi4 = smooth(timeAveragedData(:, 13), timeAveragedData(:,16), 0.1, 'lowess');
+    mi5 = smooth(timeAveragedData(:, 17), timeAveragedData(:, 20), 0.1, 'lowess');
+    mi6 = smooth(timeAveragedData(:, 21), timeAveragedData(:, 24), 0.1, 'lowess');
+    mi7 = smooth(timeAveragedData(:, 25), timeAveragedData(:, 28), 0.1, 'lowess');
+    mi8 = smooth(timeAveragedData(:, 29), timeAveragedData(:, 32), 0.1, 'lowess');
+    mi9 = smooth(timeAveragedData(:, 33), timeAveragedData(:, 36), 0.1, 'lowess');
+    mi10 = smooth(timeAveragedData(:, 37), timeAveragedData(:, 40), 0.1, 'lowess');
 
     plot( ... 
         timeAveragedData(:, 1), mi1, 'b-', ...
