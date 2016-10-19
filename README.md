@@ -23,9 +23,10 @@ This project is written in MATLAB and is intended for use in tandem with the JID
 
 Steps:
 
-1. Clone/download the `master` branch to a new folder of your choosing
-2. Visit the JIDT [here](https://github.com/jlizier/jidt) and clone/download the `master` branch as well.
-3. Your folder structure should look like this:
+1. Clone/download the `master` branch of this repository to a new folder of your choosing
+2. Visit the JIDT [here](https://github.com/jlizier/jidt)
+	- Navigate to the 'Getting Started' section and download `infodynamics-dist-1.3.zip`
+3. Download/Extract the files to a folder of your choice. Your folder structure should look like this:
 
   ```
   ├── YourNewFolder
