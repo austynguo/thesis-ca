@@ -364,7 +364,7 @@ for h = roadLengthTenth:roadLengthTenth:max_roadlength
             
             %============================
             % Mutual Information
-            % Adapted from JIDt Cellular Automata Demos to calculate Mutual
+            % Adapted from JIDT Cellular Automata Demos to calculate Mutual
             % Information
             if ((ischar(measureId) && (strcmpi('mutual', measureId) || strcmpi('transferAndMutual', measureId) || strcmpi('all', measureId) || strcmpi('mutualinfo', measureId))) || ...
                 (not(ischar(measureId)) && ((measureId == 1) || (measureId == -1))))
@@ -378,9 +378,18 @@ for h = roadLengthTenth:roadLengthTenth:max_roadlength
                 mutualInfoCalc.initialise();
 %                 mutualInfoCalc.addObservations(caStatesJInts, measureParams.j);
 %                 mutualInfoCalc.addObservations(caStatesJInts, 1, 2);
-                for i = 0:(h-2)
-%                     fprintf('%d\n', i);
-                    mutualInfoCalc.addObservations(caStatesJInts, i, i+1);
+                for i = 0:(roadlength-1)
+                    for j = 1:v_max
+    %                     fprintf('%d\n', i);
+                        % Adjusting for road wrapping when selecting target
+                        % column
+                        if i + j < roadlength
+                            targetColumn = i + j;
+                        elseif i + j >= roadlength
+                            targetColumn = mod(i+j, roadlength);
+                        end
+                        mutualInfoCalc.addObservations(caStatesJInts, i, targetColumn);
+                    end
                 end
                 %^ .addObservations within
                 % 'MutualInformationCalculatorDiscrete' doesn't work in a
