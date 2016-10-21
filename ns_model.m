@@ -288,11 +288,15 @@ for h = roadLengthTenth:roadLengthTenth:max_roadlength
         tadsum = 0;
         
         %% Calculate time averaged density
-        % Calculates density for column 1
+        % Calculates density for the centre column in the roadway
+        % This should help avoid skewing the average when run over enough
+        % timesteps?
 
+        tadTargetColumn = ceil(roadlength/2);
+        
         for i = 1:timesteps
             if verbose fprintf('c{%d, 1}: %d', i, c{i, 1}); end
-            % if cell is not empty (occupied), add one to the total sum
+            % if cell is occupied (i.e is not empty), add one to the total sum
             if c{i, 1} ~= ' '
                 tadsum = tadsum + 1;
             end
