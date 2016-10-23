@@ -387,20 +387,29 @@ for h = roadLengthTenth:roadLengthTenth:max_roadlength
                 %^ this section takes slightly diff args to TE equivalent
                 
                 mutualInfoCalc.initialise();
-%                 mutualInfoCalc.addObservations(caStatesJInts, measureParams.j);
-%                 mutualInfoCalc.addObservations(caStatesJInts, 1, 2);
+% 
+%                 for i = 0:(roadlength-1)
+%                     for j = 1:v_max
+%     %                     fprintf('%d\n', i);
+%                         % Adjusting for road wrapping when selecting target
+%                         % column
+%                         if i + j < roadlength
+%                             targetColumn = i + j;
+%                         elseif i + j >= roadlength
+%                             targetColumn = mod(i+j, roadlength);
+%                         end
+%                         mutualInfoCalc.addObservations(caStatesJInts, i, targetColumn);
+%                     end
+%                 end
                 for i = 0:(roadlength-1)
-                    for j = 1:v_max
-    %                     fprintf('%d\n', i);
-                        % Adjusting for road wrapping when selecting target
-                        % column
-                        if i + j < roadlength
-                            targetColumn = i + j;
-                        elseif i + j >= roadlength
-                            targetColumn = mod(i+j, roadlength);
-                        end
-                        mutualInfoCalc.addObservations(caStatesJInts, i, targetColumn);
+                    % Adjusting for road wrapping when selecting target
+                    % column
+                    if i + 1 < roadlength
+                        targetColumn = i + 1;
+                    elseif i + 1 >= roadlength
+                        targetColumn = mod(i+1, roadlength);
                     end
+                    mutualInfoCalc.addObservations(caStatesJInts, i, targetColumn);
                 end
                 %^ .addObservations within
                 % 'MutualInformationCalculatorDiscrete' doesn't work in a
@@ -413,7 +422,18 @@ for h = roadLengthTenth:roadLengthTenth:max_roadlength
                 average_MI_array(k, system_size_counter) = avMutualInfo;
 
                 if plotTE == true
-                    javaLocalValues = mutualInfoCalc.computeLocalFromPreviousObservations(caStatesJInts, measureParams.j);
+                    javaLocalValues = zeros(timesteps, roadlength);
+                    %%
+%                     javaLocalValues = mutualInfoCalc.computeLocalFromPreviousObservations(caStatesJInts, 0, 1);
+                    for i = 1:roadlength
+                        if i < roadlength
+                            targetColumn = i;
+                        elseif i >= roadlength
+                            targetColumn = mod(i, roadlength);
+                        end
+                        javaLocalValues(:, i) = mutualInfoCalc.computeLocalFromPreviousObservations(caStatesJInts, i-1, targetColumn);
+                    end
+                    
                     localValues = javaMatrixToOctave(javaLocalValues);
                     if (isfield(options, 'movingFrameSpeed'))
                         % User has requested us to evaluate information dynamics with a moving frame of reference
