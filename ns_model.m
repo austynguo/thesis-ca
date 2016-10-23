@@ -6,7 +6,7 @@ clear java;
 javaaddpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/infodynamics.jar')
 
 % add paths to JIDT CA octave & matlab code
-% addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave/CellularAutomata');
+addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave/CellularAutomata');
 addpath('/home/austyn/Documents/MATLAB/infodynamics-dist-1.3/demos/octave');
 
 %% === START Variable System Parameters === %%
