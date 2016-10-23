@@ -46,6 +46,8 @@ plotGraph = true;
 calcTE = true;
 plotTE = false;
 
+%% Choose whether to see plot of car distribution
+plotCarDistribution = false;
 
 %% === END Variable System Parameters === %%
 
@@ -730,33 +732,23 @@ if plotGraph == true
     xlabel('Time Averaged Density')
     ylabel('Time Averaged Flow') 
     
+    %% Plot distribution of randomly distributed cars
+    if plotCarDistribution == true
+        % sort number of cars for easy graph reading
+        num_cars_array_sorted = sort(num_cars_array);
+
+        % == Plotting cars per 'simulation round' is now rather pointless given
+        % that there are 5 to 10 rounds and we only output the graph of one
+        figure
+        bar(num_cars_array_sorted);
+        title('Cars per simulation - Sorted (Ascending)')
+        xlabel('Number of simulations run')
+        ylabel('Number of cars')
+        xlim([0 num_sims])
+    end
+    
     %% Smoothed Flow vs Density data (Multiple System Sizes)
     figure
-    % subplot(3,1,2)
-    % scatter(time_average_density_array, time_average_flow_array, 'filled');
-    % title('Averaged Density vs Flow')
-    % xlabel('Time Averaged Density')
-    % ylabel('Time Averaged Flow')
-        
-    % sort number of cars for easy graph reading
-    num_cars_array_sorted = sort(num_cars_array);
-
-    % == Plotting cars per 'simulation round' is now rather pointless given
-    % that there are 10 rounds and we only output the graph of one
-%     subplot(3,2,1)
-%     bar(num_cars_array_sorted);
-%     title('Cars per simulation - Sorted (Ascending)')
-%     xlabel('Number of simulations run')
-%     ylabel('Number of cars')
-%     xlim([0 num_sims])
-% 
-% 
-%     
-% 
-%     subplot(3,2,[3 6])
-    % Filter line
-    % windowSize = num_sims/5;
-    % yy = filter(ones(1,windowSize)/windowSize,1, timeAveragedData(:, 2));
 
     if numSystemSizes == 5 || numSystemSizes == 10
         y1 = smooth(timeAveragedData(:, 1), timeAveragedData(:, 2), 0.1, 'lowess');
