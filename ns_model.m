@@ -451,6 +451,7 @@ for h = roadLengthTenth:roadLengthTenth:max_roadlength
                         print(sprintf('figures/%s-transfer-k%d-j%d.%s', ruleString, measureParams.k, measureParams.j, options.saveImagesFormat), sprintf('-d%s', printDriver));
                     end
                     plottedOne = true;
+                    %%
                 end
             end
 
@@ -509,6 +510,7 @@ for h = roadLengthTenth:roadLengthTenth:max_roadlength
                 average_TE_array(k, system_size_counter) = avTransfer;
 
                 if plotTE == true
+                    %%
                     javaLocalValues = transferCalc.computeLocalFromPreviousObservations(caStatesJInts, measureParams.j);
                     localValues = javaMatrixToOctave(javaLocalValues);
                     if (isfield(options, 'movingFrameSpeed'))
@@ -527,6 +529,7 @@ for h = roadLengthTenth:roadLengthTenth:max_roadlength
                         print(sprintf('figures/%s-transfer-k%d-j%d.%s', ruleString, measureParams.k, measureParams.j, options.saveImagesFormat), sprintf('-d%s', printDriver));
                     end
                     plottedOne = true;
+                    %%
                 end
             end
 
